@@ -615,7 +615,7 @@ def generate_csv_data():
 # Боковая панель
 # ------------------------------
 with st.sidebar:
-    st.markdown('<div class="sidebar-header">Цифровой наставник</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sidebar-header">⚖️ Цифровой наставник</div>', unsafe_allow_html=True)
     if st.sidebar.button("🏠 Главная", key="nav_home"):
         go_to_page("intro")
 
