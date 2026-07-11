@@ -287,7 +287,7 @@ textarea, input[type="text"], input[type="password"], input[type="email"] {
     background: var(--input-bg) !important;   /* <-- теперь фон не прозрачный */
     border: none !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
-    border-radius: 0 !important;
+    border-radius: 3px !important;
     color: #FFFFFF !important;
     transition: all var(--transition-speed);
 }
