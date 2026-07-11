@@ -49,7 +49,7 @@ st.markdown(
     --transition-speed: 0.25s;
     --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     /* Добавляем переменную для фона полей ввода */
-    --input-bg: rgba(255, 255, 255, 0.07);
+    --input-bg: rgba(255, 255, 255, 1);
 }
 
 .stApp {
