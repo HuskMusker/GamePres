@@ -59,6 +59,12 @@ st.markdown(
     -moz-osx-font-smoothing: grayscale;
 }
 
+textarea, input[type="text"], input[type="password"], input[type="email"] {
+    background: #1a1a2e !important;   /* новый цвет фона */
+    color: #ffffff !important;         /* цвет текста */
+    border-bottom: 1px solid #4a4a6a !important;
+}
+
 @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(24px); }
     to { opacity: 1; transform: translateY(0); }
