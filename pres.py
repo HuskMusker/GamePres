@@ -1191,17 +1191,20 @@ elif st.session_state.page == "module13":
             # Открываем центрирующий контейнер
             st.markdown('<div class="sort-row-wrapper">', unsafe_allow_html=True)
         
-            col1, col2, col3 = st.columns([1, 3, 1])
+            col_empty_left, col1, col2, col3, col_empty_right = st.columns([2, 1, 3, 1, 2])
+            
             with col1:
                 if st.button("◀", key=f"left_{sid}"):
                     new_idx = (idx - 1) % len(cats_list)
                     st.session_state[f"m13_sort_idx_{sid}"] = new_idx
                     st.rerun()
+            
             with col2:
                 st.markdown(
                     f"<div style='text-align:center; font-weight:bold; padding: 0.5rem 0;'>{cats_list[idx]}</div>",
                     unsafe_allow_html=True
                 )
+            
             with col3:
                 if st.button("▶", key=f"right_{sid}"):
                     new_idx = (idx + 1) % len(cats_list)
