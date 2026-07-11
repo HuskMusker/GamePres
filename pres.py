@@ -24,6 +24,23 @@ if (el) el.scrollIntoView({behavior: 'instant'});
 </script>
 """, height=0)
 
+st.markdown(
+    """
+    <style>
+    /* Стиль для текстового поля */
+    .stTextArea [data-baseweb="base-input"] {
+        background-color: #f0f8ff;  /* Светло-голубой фон */
+    }
+    /* Стиль для самого поля ввода внутри */
+    .stTextArea [data-baseweb="base-input"] textarea {
+        background-color: #f0f8ff;  /* Светло-голубой фон */
+        color: #000000;             /* Черный цвет текста */
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 # ------------------------------
 # CSS (лёгкие подчёркнутые поля, улучшенная типографика)
 # ------------------------------
