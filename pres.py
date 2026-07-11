@@ -32,7 +32,7 @@ st.markdown(
     --bg-card-hover: rgba(255, 255, 255, 0.08);
     --border-card: rgba(255, 255, 255, 0.06);
     --text-primary: #FFFFFF;
-    --text-secondary: #B0B0C8;
+    --text-secondary: #F0F0F8;
     --text-muted: #8A8AA8;
     --accent-green: #00BD63;
     --accent-cyan: #40C4FF;
