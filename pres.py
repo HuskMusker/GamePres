@@ -48,6 +48,30 @@ st.markdown(
     -moz-osx-font-smoothing: grayscale;
 }
 
+.stApp {
+    position: relative;
+    background: var(--bg-primary);
+}
+
+.stApp::before {
+    content: '';
+    position: fixed;   /* или absolute, если нужно привязать к .stApp */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('bgg.png') center/cover no-repeat;
+    opacity: 0.15;      /* регулируйте прозрачность (0.0 – 1.0) */
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Поднимаем содержимое над псевдоэлементом */
+.stApp > * {
+    position: relative;
+    z-index: 1;
+}
+
 @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(24px); }
     to { opacity: 1; transform: translateY(0); }
