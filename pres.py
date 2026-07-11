@@ -92,6 +92,18 @@ h2, h3, h4 {
     margin-bottom: 1.5em;
 }
 
+/* Обёртка для центрирования всего ряда */
+.sort-row-wrapper {
+    display: flex;
+    justify-content: center;      /* горизонтальное центрирование */
+    margin: 0.5rem 0;            /* небольшой вертикальный отступ */
+}
+/* Отключаем растягивание st.columns на всю ширину */
+.sort-row-wrapper .stHorizontalBlock {
+    width: auto !important;
+    flex: 0 0 auto !important;
+}
+
 .mission-card, .theory-card {
     background: var(--bg-card);
     backdrop-filter: blur(16px);
@@ -1175,6 +1187,10 @@ elif st.session_state.page == "module13":
         for sid in range(1, 9):
             idx = st.session_state[f"m13_sort_idx_{sid}"]
             st.write(f"**Ситуация {sid}:** {situations[str(sid)]}")
+        
+            # Открываем центрирующий контейнер
+            st.markdown('<div class="sort-row-wrapper">', unsafe_allow_html=True)
+        
             col1, col2, col3 = st.columns([1, 3, 1])
             with col1:
                 if st.button("◀", key=f"left_{sid}"):
@@ -1182,12 +1198,19 @@ elif st.session_state.page == "module13":
                     st.session_state[f"m13_sort_idx_{sid}"] = new_idx
                     st.rerun()
             with col2:
-                st.markdown(f"<div style='text-align:center; font-weight:bold; padding: 0.5rem 0;'>{cats_list[idx]}</div>", unsafe_allow_html=True)
+                st.markdown(
+                    f"<div style='text-align:center; font-weight:bold; padding: 0.5rem 0;'>{cats_list[idx]}</div>",
+                    unsafe_allow_html=True
+                )
             with col3:
                 if st.button("▶", key=f"right_{sid}"):
                     new_idx = (idx + 1) % len(cats_list)
                     st.session_state[f"m13_sort_idx_{sid}"] = new_idx
                     st.rerun()
+        
+            # Закрываем центрирующий контейнер
+            st.markdown('</div>', unsafe_allow_html=True)
+        
             st.markdown("---")
 
         if st.button("✅ Проверить сортировку", key="check_sort"):
