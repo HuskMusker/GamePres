@@ -16,11 +16,6 @@ st.set_page_config(
 )
 
 # ------------------------------
-# Автопрокрутка вверх при каждой отрисовке
-# ------------------------------
-components.html("<script>window.scrollTo(0,0);</script>", height=0)
-
-# ------------------------------
 # CSS (единый стиль Stepik, без пульсации, компактные поля)
 # ------------------------------
 st.markdown(
@@ -52,7 +47,6 @@ st.markdown(
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-
 }
 
 @keyframes fadeInUp {
@@ -272,18 +266,23 @@ a:hover {
     padding-top: 0.8rem !important;
 }
 
-/* Поля ввода – светлый фон, тёмный текст (исправление белого на белом) */
+/* Компактные текстовые поля */
 textarea, input[type="text"], input[type="password"], input[type="email"] {
-    max-width: 600px !important;
+    max-width: 400px !important;
     width: 100% !important;
-    padding: 8px 10px !important;
+    padding: 4px 8px !important;
     font-size: 0.9rem !important;
-    line-height: 1.4 !important;
+    line-height: 1.2 !important;
+    min-height: 35px !important;
     background: rgba(255, 255, 255, 0.9) !important;
     border: 1px solid rgba(255, 255, 255, 0.3) !important;
     border-radius: 10px !important;
     color: #000000 !important;
     transition: all var(--transition-speed);
+}
+textarea {
+    min-height: 60px !important;
+    max-width: 400px !important;
 }
 textarea:focus, input:focus {
     border-color: var(--accent-cyan) !important;
@@ -294,6 +293,7 @@ textarea:focus, input:focus {
     color: var(--text-secondary) !important;
     font-weight: 500;
     margin-bottom: 0.2rem;
+    font-size: 0.85rem;
 }
 .stTextArea textarea {
     min-height: 60px;
@@ -343,7 +343,7 @@ div[data-testid="stAlert"][data-kind="info"] {
     border-radius: 12px;
     padding: 1rem 1.5rem;
     margin: 1.5rem 0 1rem 0;
-    color: #E0E0E0;  /* более читаемый цвет */
+    color: #E0E0E0;
     backdrop-filter: blur(4px);
 }
 .bridge-block strong {
@@ -392,6 +392,15 @@ div[data-testid="stAlert"][data-kind="info"] {
         padding: 1.5rem 1rem;
     }
 }
+
+/* Кнопки для виджета угроз */
+.threat-btn {
+    padding: 0.2rem 0.6rem !important;
+    font-size: 0.85rem !important;
+    line-height: 1 !important;
+    min-height: auto !important;
+    margin: 0 !important;
+}
 </style>
 """,
     unsafe_allow_html=True,
@@ -402,6 +411,9 @@ div[data-testid="stAlert"][data-kind="info"] {
 # ------------------------------
 INIT_STATE = {
     "page": "intro",
+    "prev_page": "intro",
+    "prev_step_12": 0,
+    "prev_step_13": 0,
     # Прогресс 1.2
     "step_12": 0,
     "max_reached_step_12": 0,
@@ -431,10 +443,12 @@ INIT_STATE = {
     "step_13": 0,
     "max_reached_step_13": 0,
     "completed_steps_13": [False]*7,
-    # Ответы 1.3: сортировка угроз (перебор кнопками)
-    **{f"m13_sort_idx_{i}": 0 for i in range(1, 9)},
+    # Новые переменные для виджета угроз
+    "m13_left": list(range(1, 9)),   # ситуации без категорий
+    "m13_right": [],                 # распределённые ситуации с категориями (храним кортежи: (sid, cat_idx))
     "m13_sort_checked": False,
     "m13_sort_score": 0,
+    # Остальные переменные 1.3
     "m13_password": "",
     "m13_password_checks": [False]*7,
     "m13_password_checked": False,
@@ -456,13 +470,31 @@ INIT_STATE = {
     "module12_finished": False,
     # Таймер
     "timer_active": False,
-    "timer_duration": 900,  # 15 минут по умолчанию
+    "timer_duration": 900,
     "timer_start": 0.0,
 }
 
 for key, value in INIT_STATE.items():
     if key not in st.session_state:
         st.session_state[key] = value
+
+# Автопрокрутка при смене шага
+current_page = st.session_state.page
+if current_page == "module12":
+    current_step = st.session_state.step_12
+    prev_step = st.session_state.prev_step_12
+    if current_step != prev_step or st.session_state.prev_page != "module12":
+        st.markdown("<script>window.scrollTo(0, 0);</script>", unsafe_allow_html=True)
+        st.session_state.prev_step_12 = current_step
+elif current_page == "module13":
+    current_step = st.session_state.step_13
+    prev_step = st.session_state.prev_step_13
+    if current_step != prev_step or st.session_state.prev_page != "module13":
+        st.markdown("<script>window.scrollTo(0, 0);</script>", unsafe_allow_html=True)
+        st.session_state.prev_step_13 = current_step
+elif current_page != st.session_state.prev_page:
+    st.markdown("<script>window.scrollTo(0, 0);</script>", unsafe_allow_html=True)
+st.session_state.prev_page = current_page
 
 # ------------------------------
 # Вспомогательные функции
@@ -585,10 +617,7 @@ def calculate_auto_score():
     return total, max_total
 
 def generate_csv_data():
-    data = {
-        "Вопрос": [],
-        "Ответ": []
-    }
+    data = {"Вопрос": [], "Ответ": []}
     # Модуль 1.2
     data["Вопрос"].append("1.2 Вступление (ответственность за данные)")
     data["Ответ"].append(st.session_state.intro_q1)
@@ -616,12 +645,14 @@ def generate_csv_data():
     return pd.DataFrame(data)
 
 def generate_mailto_body():
-    """Формирует тело письма с результатами диагностики."""
+    """Расширенное тело письма с результатами."""
     auto_score, max_auto = calculate_auto_score()
+    percent = int(auto_score/max_auto*100) if max_auto > 0 else 0
     lines = [
-        f"Результаты диагностики курса 'Цифровой куратор'",
+        "Результаты курса «Цифровой наставник»",
+        "",
         f"Автоматический балл: {auto_score} из {max_auto}",
-        f"Процент выполнения: {int(auto_score/max_auto*100)}%",
+        f"Процент выполнения: {percent}%",
         "",
         "Открытые задания:",
     ]
@@ -632,11 +663,25 @@ def generate_mailto_body():
         "Диагностика (открытые вопросы)": st.session_state.m13_diagnostic_checked
     }
     for task, completed in open_tasks.items():
-        status = "Выполнено" if completed else "Не отправлено"
-        lines.append(f"- {task}: {status}")
+        lines.append(f"- {task}: {'Выполнено' if completed else 'Не отправлено'}")
     lines.append("")
-    lines.append("Данные экспортированы из приложения 'Цифровой наставник'.")
-    return "%0D%0A".join(lines)
+    # Добавим ответы диагностики, если они есть
+    if st.session_state.m13_diagnostic_checked:
+        lines.append("Ответы диагностики:")
+        diag = st.session_state.m13_diagnostic
+        if diag.get("threats"):
+            lines.append(f"Угрозы: {diag['threats']}")
+        if diag.get("rights"):
+            lines.append(f"Права: {diag['rights']}")
+        if diag.get("plan"):
+            lines.append(f"План: {diag['plan']}")
+        if diag.get("message"):
+            lines.append(f"Сообщение: {diag['message']}")
+        if diag.get("ethics"):
+            lines.append(f"Этика: {diag['ethics']}")
+        lines.append("")
+    lines.append("Данные экспортированы из приложения «Цифровой наставник».")
+    return "\n".join(lines)
 
 # ------------------------------
 # Боковая панель
@@ -839,10 +884,10 @@ elif st.session_state.page == "module12":
         q1 = st.radio(
             "Что из перечисленного НЕ является персональными данными?",
             {
-                "A: Анонимный никнейм в игре": "Анонимный никнейм в игре",
-                "B: Номер телефона": "Номер телефона",
-                "C: Адрес электронной почты": "Адрес электронной почты",
-                "D: Серия и номер паспорта": "Серия и номер паспорта"
+                "A": "Анонимный никнейм в игре",
+                "B": "Номер телефона",
+                "C": "Адрес электронной почты",
+                "D": "Серия и номер паспорта"
             },
             key="step2_q1"
         )
@@ -871,10 +916,10 @@ elif st.session_state.page == "module12":
         q2 = st.radio(
             "Какие данные ты имеешь право собирать у клиента по закону № 152-ФЗ?",
             {
-                "A: Только те, которые необходимы для достижения конкретной цели": "Только те, которые необходимы для достижения конкретной цели",
-                "B: Любые данные, которые клиент согласился предоставить": "Любые данные, которые клиент согласился предоставить",
-                "C: Все данные, которые могут пригодиться в будущем": "Все данные, которые могут пригодиться в будущем",
-                "D: Только данные, запрошенные оператором сайта": "Только данные, запрошенные оператором сайта"
+                "A": "Только те, которые необходимы для достижения конкретной цели",
+                "B": "Любые данные, которые клиент согласился предоставить",
+                "C": "Все данные, которые могут пригодиться в будущем",
+                "D": "Только данные, запрошенные оператором сайта"
             },
             key="step2_q2"
         )
@@ -899,10 +944,10 @@ elif st.session_state.page == "module12":
         q3 = st.radio(
             "Клиент просит удалить все его данные из вашей базы. Что ты обязан сделать по закону?",
             {
-                "A: Отказать, так как данные уже обработаны": "Отказать, так как данные уже обработаны",
-                "B: Удалить данные в течение 30 дней": "Удалить данные в течение 30 дней",
-                "C: Объяснить, что удаление невозможно, и предложить альтернативу": "Объяснить, что удаление невозможно, и предложить альтернативу",
-                "D: Удалить данные в срок, установленный законом": "Удалить данные в срок, установленный законом"
+                "A": "Отказать, так как данные уже обработаны",
+                "B": "Удалить данные в течение 30 дней",
+                "C": "Объяснить, что удаление невозможно, и предложить альтернативу",
+                "D": "Удалить данные в срок, установленный законом"
             },
             key="step2_q3"
         )
@@ -922,10 +967,10 @@ elif st.session_state.page == "module12":
         q4 = st.radio(
             "Какая ответственность грозит за утечку персональных данных клиентов, если она произошла по твоей вине?",
             {
-                "A: Только дисциплинарная (выговор)": "Только дисциплинарная (выговор)",
-                "B: Административная (штраф) и возможная гражданско-правовая": "Административная (штраф) и возможная гражданско-правовая",
-                "C: Только уголовная": "Только уголовная",
-                "D: Никакой, если утечка произошла случайно": "Никакой, если утечка произошла случайно"
+                "A": "Только дисциплинарная (выговор)",
+                "B": "Административная (штраф) и возможная гражданско-правовая",
+                "C": "Только уголовная",
+                "D": "Никакой, если утечка произошла случайно"
             },
             key="step2_q4"
         )
@@ -988,7 +1033,7 @@ elif st.session_state.page == "module12":
             "Выбери наиболее полный ответ:",
             {
                 "A: Принцип конфиденциальности и право на частную жизнь": "Принцип конфиденциальности и право на частную жизнь",
-                "B: Принцип «не навреди» и обязанность обеспечивать безопасность данных" : "Принцип «не навреди» и обязанность обеспечивать безопасность данных",
+                "B: Принцип «не навреди» и обязанность обеспечивать безопасность данных": "Принцип «не навреди» и обязанность обеспечивать безопасность данных",
                 "C: Принцип информированного согласия": "Принцип информированного согласия",
                 "D: Все перечисленные выше": "Все перечисленные выше",
             },
@@ -1135,27 +1180,20 @@ elif st.session_state.page == "module13":
         st.markdown('<div class="main-header">Блок 1. Анализ угроз: что может угрожать клиенту?</div>', unsafe_allow_html=True)
         st.markdown("""
         <div class="theory-card">
-          <p>Прежде чем помогать клиенту, нужно понять, от чего его защищать. Вспомни основные виды угроз:</p>
-          <ul>
-            <li>фишинг (мошеннические письма и сайты);</li>
-            <li>социальная инженерия (манипуляция через эмоции);</li>
-            <li>слабые пароли и их повторное использование;</li>
-            <li>кража данных через утечки и взломы;</li>
-            <li>неправильные настройки приватности.</li>
-          </ul>
-          <p><strong>Задание:</strong> для каждой ситуации выбери подходящую категорию, используя кнопки <strong>◀</strong> и <strong>▶</strong> для перебора.</p>
+          <p>Распредели ситуации по категориям угроз. Слева — все ситуации, справа — уже распределённые.</p>
+          <p><strong>Как работать:</strong> в левой колонке выбери категорию из выпадающего списка и нажми <strong>›</strong> для добавления в правую. В правой колонке можно менять порядок стрелками ↑↓ и удалять обратно кнопкой ‹.</p>
         </div>
         """, unsafe_allow_html=True)
 
         situations = {
-            "1": "Вы получили письмо от «банка» с просьбой перейти по ссылке и подтвердить данные карты",
-            "2": "Ваш друг просит скинуть пароль от почты, потому что «срочно нужно подтвердить аккаунт»",
-            "3": "Вы используете один и тот же пароль для Госуслуг, электронной почты и соцсетей",
-            "4": "Ваш аккаунт взломали, и данные клиентов оказались в открытом доступе",
-            "5": "Вы выложили фотографию паспорта в открытом Instagram-аккаунте",
-            "6": "Звонит «сотрудник полиции» и просит продиктовать код из SMS для проверки",
-            "7": "Ваш пароль состоит из даты рождения и имени кота",
-            "8": "Вы не знаете, какие настройки приватности включены в вашем Telegram"
+            1: "Письмо от «банка» с просьбой перейти по ссылке",
+            2: "Друг просит пароль от почты",
+            3: "Один пароль для Госуслуг и соцсетей",
+            4: "Взлом аккаунта, данные клиентов утекли",
+            5: "Фото паспорта в открытом Instagram",
+            6: "Звонок «сотрудника полиции» с просьбой кода из SMS",
+            7: "Пароль из даты рождения и имени кота",
+            8: "Неизвестные настройки приватности в Telegram"
         }
         categories = [
             "Фишинг и мошенничество",
@@ -1165,44 +1203,93 @@ elif st.session_state.page == "module13":
             "Утечка и взлом"
         ]
         correct_map = {
-            "1": "Фишинг и мошенничество",
-            "2": "Социальная инженерия",
-            "3": "Слабые пароли и идентификация",
-            "4": "Утечка и взлом",
-            "5": "Неправильная приватность",
-            "6": "Социальная инженерия",
-            "7": "Слабые пароли и идентификация",
-            "8": "Неправильная приватность"
+            1: "Фишинг и мошенничество",
+            2: "Социальная инженерия",
+            3: "Слабые пароли и идентификация",
+            4: "Утечка и взлом",
+            5: "Неправильная приватность",
+            6: "Социальная инженерия",
+            7: "Слабые пароли и идентификация",
+            8: "Неправильная приватность"
         }
 
-        cats_list = ["Не выбрана"] + categories
-        for sid in range(1, 9):
-            idx = st.session_state[f"m13_sort_idx_{sid}"]
-            col1, col2, col3 = st.columns([5, 1, 1])
-            with col1:
-                st.write(f"**Ситуация {sid}:** {situations[str(sid)]}")
-            with col2:
-                if st.button("◀", key=f"left_{sid}"):
-                    new_idx = (idx - 1) % len(cats_list)
-                    st.session_state[f"m13_sort_idx_{sid}"] = new_idx
-                    st.rerun()
-            with col3:
-                if st.button("▶", key=f"right_{sid}"):
-                    new_idx = (idx + 1) % len(cats_list)
-                    st.session_state[f"m13_sort_idx_{sid}"] = new_idx
-                    st.rerun()
-            st.caption(f"*{cats_list[idx]}*")
+        # Инициализация left/right при первом заходе
+        if "m13_left" not in st.session_state:
+            st.session_state.m13_left = list(range(1, 9))
+            st.session_state.m13_right = []
 
+        left = st.session_state.m13_left
+        right = st.session_state.m13_right
+
+        col_left, col_center, col_right = st.columns([5, 1, 6])
+
+        with col_left:
+            st.markdown("**Доступные угрозы**")
+            if not left:
+                st.info("Все ситуации распределены.")
+            else:
+                for sid in left:
+                    with st.container():
+                        st.write(f"{sid}. {situations[sid]}")
+                        cat = st.selectbox("Категория", ["Выберите..."] + categories, key=f"left_cat_{sid}", label_visibility="collapsed")
+                        if st.button("›", key=f"add_{sid}"):
+                            if cat != "Выберите...":
+                                idx = categories.index(cat) + 1  # 1-based для совместимости с проверкой
+                                # Записываем индекс категории
+                                st.session_state[f"m13_sort_idx_{sid}"] = idx
+                                # Добавляем в right и удаляем из left
+                                st.session_state.m13_right.append((sid, idx))
+                                st.session_state.m13_left.remove(sid)
+                                st.rerun()
+                            else:
+                                st.warning("Выберите категорию перед добавлением.")
+
+        with col_center:
+            st.markdown("<br>", unsafe_allow_html=True)
+
+        with col_right:
+            st.markdown("**Распределённые по категориям**")
+            if not right:
+                st.info("Пока ничего не добавлено.")
+            else:
+                for i, (sid, cat_idx) in enumerate(right):
+                    with st.container():
+                        cat_name = categories[cat_idx - 1] if cat_idx > 0 else "Не выбрана"
+                        st.write(f"{sid}. {situations[sid]} → {cat_name}")
+                        col_btns = st.columns([1,1,1])
+                        with col_btns[0]:
+                            if st.button("‹", key=f"remove_{sid}"):
+                                # Возврат в left, сброс категории
+                                st.session_state[f"m13_sort_idx_{sid}"] = 0
+                                st.session_state.m13_right = [(s, c) for (s, c) in right if s != sid]
+                                st.session_state.m13_left.append(sid)
+                                st.rerun()
+                        with col_btns[1]:
+                            if i > 0:
+                                if st.button("↑", key=f"up_{sid}"):
+                                    # Переместить вверх
+                                    right[i], right[i-1] = right[i-1], right[i]
+                                    st.session_state.m13_right = right
+                                    st.rerun()
+                        with col_btns[2]:
+                            if i < len(right)-1:
+                                if st.button("↓", key=f"down_{sid}"):
+                                    right[i], right[i+1] = right[i+1], right[i]
+                                    st.session_state.m13_right = right
+                                    st.rerun()
+        st.markdown("---")
         if st.button("✅ Проверить сортировку", key="check_sort"):
             st.session_state.m13_sort_checked = True
             score = 0
             for sid in range(1, 9):
-                idx = st.session_state[f"m13_sort_idx_{sid}"]
-                if idx > 0 and cats_list[idx] == correct_map[str(sid)]:
+                idx = st.session_state.get(f"m13_sort_idx_{sid}", 0)
+                # Определяем название категории по индексу
+                cat_name = categories[idx-1] if idx > 0 else "Не выбрана"
+                if idx > 0 and cat_name == correct_map[sid]:
                     score += 1
                     st.success(f"Ситуация {sid}: ✅ Верно")
                 else:
-                    st.error(f"Ситуация {sid}: ❌ Неверно. Правильно: {correct_map[str(sid)]}")
+                    st.error(f"Ситуация {sid}: ❌ Неверно. Правильно: {correct_map[sid]}")
             st.session_state.m13_sort_score = score
             if score == 8:
                 st.success("🎉 Отлично! Ты правильно определил все виды угроз.")
@@ -1215,7 +1302,6 @@ elif st.session_state.page == "module13":
               <strong>📌 Связь с теорией 1.2:</strong> Запомни: если ты как куратор не распознаешь угрозу, ты не сможешь защитить клиента. Это нарушает принцип "не навреди" и обязанность по обеспечению безопасности данных (№ 152-ФЗ).
             </div>
             """, unsafe_allow_html=True)
-
         render_nav_buttons(0, 2, not st.session_state.m13_sort_checked)
 
     elif step == 2:
@@ -1611,34 +1697,37 @@ elif st.session_state.page == "diagnostics":
         mime='text/csv',
     )
 
-    # Отправка результатов на почту
+    # Отправка результатов на почту с копированием
     st.markdown("---")
-    st.markdown("### 📧 Отправить результаты на почту")
-    with st.form("email_form"):
-        user_email = st.text_input("Введите ваш email:", placeholder="example@mail.com")
-        submitted_email = st.form_submit_button("📤 Отправить результаты")
-        if submitted_email:
-            if user_email and re.match(r"[^@]+@[^@]+\.[^@]+", user_email):
-                mailto_link = f"mailto:digitalmentor@example.com?subject=Результаты%20диагностики&body={generate_mailto_body()}"
-                st.markdown(f'<a href="{mailto_link}" target="_blank">Нажмите здесь, чтобы открыть почтовый клиент и отправить результаты</a>', unsafe_allow_html=True)
-                st.success(f"Письмо готово для отправки на {user_email} (через вашу почтовую программу).")
-            else:
-                st.error("Пожалуйста, введите корректный email.")
+    st.markdown("### 📧 Отправить результаты")
+    email_body = generate_mailto_body()
+    st.text_area("Письмо (можно скопировать)", value=email_body, height=250, key="email_body_display", disabled=True)
+    col_copy, col_mailto = st.columns([1, 1])
+    with col_copy:
+        # Кнопка копирования через JavaScript
+        components.html(f"""
+            <textarea id="copy_target" style="display:none;">{email_body}</textarea>
+            <button onclick="navigator.clipboard.writeText(document.getElementById('copy_target').value);" 
+                    style="padding: 0.5rem 1rem; background: var(--accent-cyan); color: black; border: none; border-radius: 8px; cursor: pointer;">
+                📋 Скопировать в буфер
+            </button>
+        """, height=50)
+    with col_mailto:
+        mailto_link = f"mailto:example@gmail.com?subject=Результаты%20курса%20«Цифровой%20наставник»&body={email_body.replace(chr(10), '%0D%0A')}"
+        st.markdown(f'<a href="{mailto_link}" target="_blank"><button style="padding: 0.5rem 1rem; background: var(--accent-green); color: black; border: none; border-radius: 8px; cursor: pointer;">📤 Отправить через почтовый клиент</button></a>', unsafe_allow_html=True)
+    st.caption("Тема письма: Результаты курса «Цифровой наставник»")
 
-    # Кнопка "Пройти диагностику заново" (с полным сбросом диагностических переменных и переходом к шагу 6 модуля 1.3)
+    # Кнопка "Пройти диагностику заново"
     st.markdown("---")
     col1, col2 = st.columns(2)
     with col1:
         if st.button("🔄 Пройти диагностику заново"):
-            # Сброс всех полей, связанных с диагностикой модуля 1.3
             keys_to_reset = [key for key in st.session_state if key.startswith("m13_diag") or key.startswith("m13_diagnostic")]
             for key in keys_to_reset:
                 if key in INIT_STATE:
                     st.session_state[key] = INIT_STATE[key]
                 else:
-                    # дополнительные ключи, если есть
-                    st.session_state[key] = INIT_STATE.get(key, None)
-            # Возвращаемся на шаг диагностики в модуле 1.3
+                    st.session_state[key] = None
             st.session_state.page = "module13"
             st.session_state.step_13 = 6
             st.rerun()
