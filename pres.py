@@ -15,8 +15,17 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Якорь и скрипт для гарантированной прокрутки вверх при каждом rerun
+st.markdown('<div id="top"></div>', unsafe_allow_html=True)
+components.html("""
+<script>
+var el = document.getElementById('top');
+if (el) el.scrollIntoView({behavior: 'instant'});
+</script>
+""", height=0)
+
 # ------------------------------
-# CSS (единый стиль Stepik, без пульсации, компактные поля)
+# CSS (лёгкие подчёркнутые поля, улучшенная типографика)
 # ------------------------------
 st.markdown(
     """
@@ -41,7 +50,6 @@ st.markdown(
 
 .stApp {
     background: var(--bg-primary);
-    url('bgg.png') center/cover no-repeat fixed;
     color: var(--text-primary);
     font-family: var(--font-family);
     line-height: 1.6;
@@ -134,7 +142,7 @@ h2, h3, h4 {
     box-shadow: none;
 }
 
-/* Кнопка "Назад" в nav-container (первая колонка) – улучшенный контраст */
+/* Кнопка "Назад" в nav-container */
 .nav-container > div:first-child .stButton button {
     background: rgba(255, 255, 255, 0.15);
     border: 1px solid rgba(255, 255, 255, 0.5);
@@ -237,7 +245,6 @@ a:hover {
     border: 1px solid rgba(255, 215, 0, 0.15);
 }
 
-/* Радио-кнопки и чекбоксы – улучшенная читаемость */
 .stRadio > div, .stCheckbox > div {
     margin-bottom: 0.6rem;
 }
@@ -266,37 +273,35 @@ a:hover {
     padding-top: 0.8rem !important;
 }
 
-/* Компактные текстовые поля */
+/* Компактные подчёркнутые поля ввода (только нижняя линия) */
 textarea, input[type="text"], input[type="password"], input[type="email"] {
-    max-width: 400px !important;
+    max-width: 600px !important;
     width: 100% !important;
-    padding: 4px 8px !important;
-    font-size: 0.9rem !important;
-    line-height: 1.2 !important;
-    min-height: 35px !important;
-    background: rgba(255, 255, 255, 0.9) !important;
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
-    border-radius: 10px !important;
-    color: #000000 !important;
+    padding: 8px 0 !important;
+    font-size: 0.95rem !important;
+    line-height: 1.4 !important;
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
+    border-radius: 0 !important;
+    color: #FFFFFF !important;
     transition: all var(--transition-speed);
 }
-textarea {
-    min-height: 60px !important;
-    max-width: 400px !important;
-}
 textarea:focus, input:focus {
-    border-color: var(--accent-cyan) !important;
+    border-bottom-color: var(--accent-cyan) !important;
     outline: none !important;
-    box-shadow: 0 0 0 2px rgba(64,196,255,0.2) !important;
+    box-shadow: 0 1px 0 0 var(--accent-cyan) !important;
 }
 .stTextArea label, .stTextInput label {
     color: var(--text-secondary) !important;
     font-weight: 500;
     margin-bottom: 0.2rem;
-    font-size: 0.85rem;
 }
 .stTextArea textarea {
     min-height: 60px;
+}
+input::placeholder, textarea::placeholder {
+    color: rgba(255, 255, 255, 0.5) !important;
 }
 
 ::-webkit-scrollbar {
@@ -314,7 +319,6 @@ textarea:focus, input:focus {
     background: var(--text-secondary);
 }
 
-/* Цветовая дифференциация уведомлений */
 div[data-testid="stAlert"] {
     border-left-width: 4px !important;
     border-left-style: solid !important;
@@ -392,15 +396,6 @@ div[data-testid="stAlert"][data-kind="info"] {
         padding: 1.5rem 1rem;
     }
 }
-
-/* Кнопки для виджета угроз */
-.threat-btn {
-    padding: 0.2rem 0.6rem !important;
-    font-size: 0.85rem !important;
-    line-height: 1 !important;
-    min-height: auto !important;
-    margin: 0 !important;
-}
 </style>
 """,
     unsafe_allow_html=True,
@@ -411,14 +406,9 @@ div[data-testid="stAlert"][data-kind="info"] {
 # ------------------------------
 INIT_STATE = {
     "page": "intro",
-    "prev_page": "intro",
-    "prev_step_12": 0,
-    "prev_step_13": 0,
-    # Прогресс 1.2
     "step_12": 0,
     "max_reached_step_12": 0,
     "completed_steps_12": [False]*5,
-    # Ответы 1.2
     "intro_q1": None,
     "match_Владелец информации": None,
     "match_Обладатель информации": None,
@@ -439,16 +429,12 @@ INIT_STATE = {
     "step4_checked": False,
     "final_score_slider": 5,
     "final_text": "",
-    # Прогресс 1.3
     "step_13": 0,
     "max_reached_step_13": 0,
     "completed_steps_13": [False]*7,
-    # Новые переменные для виджета угроз
-    "m13_left": list(range(1, 9)),   # ситуации без категорий
-    "m13_right": [],                 # распределённые ситуации с категориями (храним кортежи: (sid, cat_idx))
+    **{f"m13_sort_idx_{i}": 0 for i in range(1, 9)},
     "m13_sort_checked": False,
     "m13_sort_score": 0,
-    # Остальные переменные 1.3
     "m13_password": "",
     "m13_password_checks": [False]*7,
     "m13_password_checked": False,
@@ -466,9 +452,7 @@ INIT_STATE = {
     "m13_diagnostic_checks": [False]*7,
     "m13_diagnostic_checked": False,
     "m13_diag_score": 0,
-    # Флаг завершения модуля 1.2
     "module12_finished": False,
-    # Таймер
     "timer_active": False,
     "timer_duration": 900,
     "timer_start": 0.0,
@@ -477,24 +461,6 @@ INIT_STATE = {
 for key, value in INIT_STATE.items():
     if key not in st.session_state:
         st.session_state[key] = value
-
-# Автопрокрутка при смене шага
-current_page = st.session_state.page
-if current_page == "module12":
-    current_step = st.session_state.step_12
-    prev_step = st.session_state.prev_step_12
-    if current_step != prev_step or st.session_state.prev_page != "module12":
-        st.markdown("<script>window.scrollTo(0, 0);</script>", unsafe_allow_html=True)
-        st.session_state.prev_step_12 = current_step
-elif current_page == "module13":
-    current_step = st.session_state.step_13
-    prev_step = st.session_state.prev_step_13
-    if current_step != prev_step or st.session_state.prev_page != "module13":
-        st.markdown("<script>window.scrollTo(0, 0);</script>", unsafe_allow_html=True)
-        st.session_state.prev_step_13 = current_step
-elif current_page != st.session_state.prev_page:
-    st.markdown("<script>window.scrollTo(0, 0);</script>", unsafe_allow_html=True)
-st.session_state.prev_page = current_page
 
 # ------------------------------
 # Вспомогательные функции
@@ -618,7 +584,6 @@ def calculate_auto_score():
 
 def generate_csv_data():
     data = {"Вопрос": [], "Ответ": []}
-    # Модуль 1.2
     data["Вопрос"].append("1.2 Вступление (ответственность за данные)")
     data["Ответ"].append(st.session_state.intro_q1)
     for term in ["Владелец информации", "Обладатель информации", "Провайдер", "Владелец сайта", "Пользователь"]:
@@ -631,7 +596,6 @@ def generate_csv_data():
     data["Ответ"].append(st.session_state.final_score_slider)
     data["Вопрос"].append("1.2 Обоснование")
     data["Ответ"].append(st.session_state.final_text)
-    # Модуль 1.3
     data["Вопрос"].append("1.3 Памятка (отправлена)")
     data["Ответ"].append("Да" if st.session_state.m13_memo_sent else "Нет")
     data["Вопрос"].append("1.3 Кейс (выбор)")
@@ -645,14 +609,11 @@ def generate_csv_data():
     return pd.DataFrame(data)
 
 def generate_mailto_body():
-    """Расширенное тело письма с результатами."""
     auto_score, max_auto = calculate_auto_score()
-    percent = int(auto_score/max_auto*100) if max_auto > 0 else 0
     lines = [
-        "Результаты курса «Цифровой наставник»",
-        "",
+        f"Результаты диагностики курса 'Цифровой куратор'",
         f"Автоматический балл: {auto_score} из {max_auto}",
-        f"Процент выполнения: {percent}%",
+        f"Процент выполнения: {int(auto_score/max_auto*100)}%",
         "",
         "Открытые задания:",
     ]
@@ -663,25 +624,11 @@ def generate_mailto_body():
         "Диагностика (открытые вопросы)": st.session_state.m13_diagnostic_checked
     }
     for task, completed in open_tasks.items():
-        lines.append(f"- {task}: {'Выполнено' if completed else 'Не отправлено'}")
+        status = "Выполнено" if completed else "Не отправлено"
+        lines.append(f"- {task}: {status}")
     lines.append("")
-    # Добавим ответы диагностики, если они есть
-    if st.session_state.m13_diagnostic_checked:
-        lines.append("Ответы диагностики:")
-        diag = st.session_state.m13_diagnostic
-        if diag.get("threats"):
-            lines.append(f"Угрозы: {diag['threats']}")
-        if diag.get("rights"):
-            lines.append(f"Права: {diag['rights']}")
-        if diag.get("plan"):
-            lines.append(f"План: {diag['plan']}")
-        if diag.get("message"):
-            lines.append(f"Сообщение: {diag['message']}")
-        if diag.get("ethics"):
-            lines.append(f"Этика: {diag['ethics']}")
-        lines.append("")
-    lines.append("Данные экспортированы из приложения «Цифровой наставник».")
-    return "\n".join(lines)
+    lines.append("Данные экспортированы из приложения 'Цифровой наставник'.")
+    return "%0D%0A".join(lines)
 
 # ------------------------------
 # Боковая панель
@@ -1032,10 +979,10 @@ elif st.session_state.page == "module12":
         principle_choice = st.radio(
             "Выбери наиболее полный ответ:",
             {
-                "A: Принцип конфиденциальности и право на частную жизнь": "Принцип конфиденциальности и право на частную жизнь",
-                "B: Принцип «не навреди» и обязанность обеспечивать безопасность данных": "Принцип «не навреди» и обязанность обеспечивать безопасность данных",
-                "C: Принцип информированного согласия": "Принцип информированного согласия",
-                "D: Все перечисленные выше": "Все перечисленные выше",
+                "A": "Принцип конфиденциальности и право на частную жизнь",
+                "B": "Принцип «не навреди» и обязанность обеспечивать безопасность данных",
+                "C": "Принцип информированного согласия",
+                "D": "Все перечисленные выше"
             },
             key="step3_q2"
         )
@@ -1180,20 +1127,27 @@ elif st.session_state.page == "module13":
         st.markdown('<div class="main-header">Блок 1. Анализ угроз: что может угрожать клиенту?</div>', unsafe_allow_html=True)
         st.markdown("""
         <div class="theory-card">
-          <p>Распредели ситуации по категориям угроз. Слева — все ситуации, справа — уже распределённые.</p>
-          <p><strong>Как работать:</strong> в левой колонке выбери категорию из выпадающего списка и нажми <strong>›</strong> для добавления в правую. В правой колонке можно менять порядок стрелками ↑↓ и удалять обратно кнопкой ‹.</p>
+          <p>Прежде чем помогать клиенту, нужно понять, от чего его защищать. Вспомни основные виды угроз:</p>
+          <ul>
+            <li>фишинг (мошеннические письма и сайты);</li>
+            <li>социальная инженерия (манипуляция через эмоции);</li>
+            <li>слабые пароли и их повторное использование;</li>
+            <li>кража данных через утечки и взломы;</li>
+            <li>неправильные настройки приватности.</li>
+          </ul>
+          <p><strong>Задание:</strong> для каждой ситуации выбери подходящую категорию, используя кнопки <strong>◀</strong> и <strong>▶</strong> для перебора.</p>
         </div>
         """, unsafe_allow_html=True)
 
         situations = {
-            1: "Письмо от «банка» с просьбой перейти по ссылке",
-            2: "Друг просит пароль от почты",
-            3: "Один пароль для Госуслуг и соцсетей",
-            4: "Взлом аккаунта, данные клиентов утекли",
-            5: "Фото паспорта в открытом Instagram",
-            6: "Звонок «сотрудника полиции» с просьбой кода из SMS",
-            7: "Пароль из даты рождения и имени кота",
-            8: "Неизвестные настройки приватности в Telegram"
+            "1": "Вы получили письмо от «банка» с просьбой перейти по ссылке и подтвердить данные карты",
+            "2": "Ваш друг просит скинуть пароль от почты, потому что «срочно нужно подтвердить аккаунт»",
+            "3": "Вы используете один и тот же пароль для Госуслуг, электронной почты и соцсетей",
+            "4": "Ваш аккаунт взломали, и данные клиентов оказались в открытом доступе",
+            "5": "Вы выложили фотографию паспорта в открытом Instagram-аккаунте",
+            "6": "Звонит «сотрудник полиции» и просит продиктовать код из SMS для проверки",
+            "7": "Ваш пароль состоит из даты рождения и имени кота",
+            "8": "Вы не знаете, какие настройки приватности включены в вашем Telegram"
         }
         categories = [
             "Фишинг и мошенничество",
@@ -1203,93 +1157,45 @@ elif st.session_state.page == "module13":
             "Утечка и взлом"
         ]
         correct_map = {
-            1: "Фишинг и мошенничество",
-            2: "Социальная инженерия",
-            3: "Слабые пароли и идентификация",
-            4: "Утечка и взлом",
-            5: "Неправильная приватность",
-            6: "Социальная инженерия",
-            7: "Слабые пароли и идентификация",
-            8: "Неправильная приватность"
+            "1": "Фишинг и мошенничество",
+            "2": "Социальная инженерия",
+            "3": "Слабые пароли и идентификация",
+            "4": "Утечка и взлом",
+            "5": "Неправильная приватность",
+            "6": "Социальная инженерия",
+            "7": "Слабые пароли и идентификация",
+            "8": "Неправильная приватность"
         }
 
-        # Инициализация left/right при первом заходе
-        if "m13_left" not in st.session_state:
-            st.session_state.m13_left = list(range(1, 9))
-            st.session_state.m13_right = []
+        cats_list = ["Не выбрана"] + categories
+        for sid in range(1, 9):
+            idx = st.session_state[f"m13_sort_idx_{sid}"]
+            st.write(f"**Ситуация {sid}:** {situations[str(sid)]}")
+            col1, col2, col3 = st.columns([1, 3, 1])
+            with col1:
+                if st.button("◀", key=f"left_{sid}"):
+                    new_idx = (idx - 1) % len(cats_list)
+                    st.session_state[f"m13_sort_idx_{sid}"] = new_idx
+                    st.rerun()
+            with col2:
+                st.markdown(f"<div style='text-align:center; font-weight:bold; padding: 0.5rem 0;'>{cats_list[idx]}</div>", unsafe_allow_html=True)
+            with col3:
+                if st.button("▶", key=f"right_{sid}"):
+                    new_idx = (idx + 1) % len(cats_list)
+                    st.session_state[f"m13_sort_idx_{sid}"] = new_idx
+                    st.rerun()
+            st.markdown("---")
 
-        left = st.session_state.m13_left
-        right = st.session_state.m13_right
-
-        col_left, col_center, col_right = st.columns([5, 1, 6])
-
-        with col_left:
-            st.markdown("**Доступные угрозы**")
-            if not left:
-                st.info("Все ситуации распределены.")
-            else:
-                for sid in left:
-                    with st.container():
-                        st.write(f"{sid}. {situations[sid]}")
-                        cat = st.selectbox("Категория", ["Выберите..."] + categories, key=f"left_cat_{sid}", label_visibility="collapsed")
-                        if st.button("›", key=f"add_{sid}"):
-                            if cat != "Выберите...":
-                                idx = categories.index(cat) + 1  # 1-based для совместимости с проверкой
-                                # Записываем индекс категории
-                                st.session_state[f"m13_sort_idx_{sid}"] = idx
-                                # Добавляем в right и удаляем из left
-                                st.session_state.m13_right.append((sid, idx))
-                                st.session_state.m13_left.remove(sid)
-                                st.rerun()
-                            else:
-                                st.warning("Выберите категорию перед добавлением.")
-
-        with col_center:
-            st.markdown("<br>", unsafe_allow_html=True)
-
-        with col_right:
-            st.markdown("**Распределённые по категориям**")
-            if not right:
-                st.info("Пока ничего не добавлено.")
-            else:
-                for i, (sid, cat_idx) in enumerate(right):
-                    with st.container():
-                        cat_name = categories[cat_idx - 1] if cat_idx > 0 else "Не выбрана"
-                        st.write(f"{sid}. {situations[sid]} → {cat_name}")
-                        col_btns = st.columns([1,1,1])
-                        with col_btns[0]:
-                            if st.button("‹", key=f"remove_{sid}"):
-                                # Возврат в left, сброс категории
-                                st.session_state[f"m13_sort_idx_{sid}"] = 0
-                                st.session_state.m13_right = [(s, c) for (s, c) in right if s != sid]
-                                st.session_state.m13_left.append(sid)
-                                st.rerun()
-                        with col_btns[1]:
-                            if i > 0:
-                                if st.button("↑", key=f"up_{sid}"):
-                                    # Переместить вверх
-                                    right[i], right[i-1] = right[i-1], right[i]
-                                    st.session_state.m13_right = right
-                                    st.rerun()
-                        with col_btns[2]:
-                            if i < len(right)-1:
-                                if st.button("↓", key=f"down_{sid}"):
-                                    right[i], right[i+1] = right[i+1], right[i]
-                                    st.session_state.m13_right = right
-                                    st.rerun()
-        st.markdown("---")
         if st.button("✅ Проверить сортировку", key="check_sort"):
             st.session_state.m13_sort_checked = True
             score = 0
             for sid in range(1, 9):
-                idx = st.session_state.get(f"m13_sort_idx_{sid}", 0)
-                # Определяем название категории по индексу
-                cat_name = categories[idx-1] if idx > 0 else "Не выбрана"
-                if idx > 0 and cat_name == correct_map[sid]:
+                idx = st.session_state[f"m13_sort_idx_{sid}"]
+                if idx > 0 and cats_list[idx] == correct_map[str(sid)]:
                     score += 1
                     st.success(f"Ситуация {sid}: ✅ Верно")
                 else:
-                    st.error(f"Ситуация {sid}: ❌ Неверно. Правильно: {correct_map[sid]}")
+                    st.error(f"Ситуация {sid}: ❌ Неверно. Правильно: {correct_map[str(sid)]}")
             st.session_state.m13_sort_score = score
             if score == 8:
                 st.success("🎉 Отлично! Ты правильно определил все виды угроз.")
@@ -1302,6 +1208,7 @@ elif st.session_state.page == "module13":
               <strong>📌 Связь с теорией 1.2:</strong> Запомни: если ты как куратор не распознаешь угрозу, ты не сможешь защитить клиента. Это нарушает принцип "не навреди" и обязанность по обеспечению безопасности данных (№ 152-ФЗ).
             </div>
             """, unsafe_allow_html=True)
+
         render_nav_buttons(0, 2, not st.session_state.m13_sort_checked)
 
     elif step == 2:
@@ -1687,7 +1594,6 @@ elif st.session_state.page == "diagnostics":
     st.markdown(f"**Твой уровень:** {level}")
     st.success(f"💡 {advice}")
 
-    # Экспорт ответов
     csv_df = generate_csv_data()
     csv_data = csv_df.to_csv(index=False).encode('utf-8')
     st.download_button(
@@ -1697,27 +1603,19 @@ elif st.session_state.page == "diagnostics":
         mime='text/csv',
     )
 
-    # Отправка результатов на почту с копированием
     st.markdown("---")
-    st.markdown("### 📧 Отправить результаты")
-    email_body = generate_mailto_body()
-    st.text_area("Письмо (можно скопировать)", value=email_body, height=250, key="email_body_display", disabled=True)
-    col_copy, col_mailto = st.columns([1, 1])
-    with col_copy:
-        # Кнопка копирования через JavaScript
-        components.html(f"""
-            <textarea id="copy_target" style="display:none;">{email_body}</textarea>
-            <button onclick="navigator.clipboard.writeText(document.getElementById('copy_target').value);" 
-                    style="padding: 0.5rem 1rem; background: var(--accent-cyan); color: black; border: none; border-radius: 8px; cursor: pointer;">
-                📋 Скопировать в буфер
-            </button>
-        """, height=50)
-    with col_mailto:
-        mailto_link = f"mailto:example@gmail.com?subject=Результаты%20курса%20«Цифровой%20наставник»&body={email_body.replace(chr(10), '%0D%0A')}"
-        st.markdown(f'<a href="{mailto_link}" target="_blank"><button style="padding: 0.5rem 1rem; background: var(--accent-green); color: black; border: none; border-radius: 8px; cursor: pointer;">📤 Отправить через почтовый клиент</button></a>', unsafe_allow_html=True)
-    st.caption("Тема письма: Результаты курса «Цифровой наставник»")
+    st.markdown("### 📧 Отправить результаты на почту")
+    with st.form("email_form"):
+        user_email = st.text_input("Введите ваш email:", placeholder="example@mail.com")
+        submitted_email = st.form_submit_button("📤 Отправить результаты")
+        if submitted_email:
+            if user_email and re.match(r"[^@]+@[^@]+\.[^@]+", user_email):
+                mailto_link = f"mailto:digitalmentor@example.com?subject=Результаты%20диагностики&body={generate_mailto_body()}"
+                st.markdown(f'<a href="{mailto_link}" target="_blank">Нажмите здесь, чтобы открыть почтовый клиент и отправить результаты</a>', unsafe_allow_html=True)
+                st.success(f"Письмо готово для отправки на {user_email} (через вашу почтовую программу).")
+            else:
+                st.error("Пожалуйста, введите корректный email.")
 
-    # Кнопка "Пройти диагностику заново"
     st.markdown("---")
     col1, col2 = st.columns(2)
     with col1:
@@ -1727,7 +1625,7 @@ elif st.session_state.page == "diagnostics":
                 if key in INIT_STATE:
                     st.session_state[key] = INIT_STATE[key]
                 else:
-                    st.session_state[key] = None
+                    st.session_state[key] = INIT_STATE.get(key, None)
             st.session_state.page = "module13"
             st.session_state.step_13 = 6
             st.rerun()
