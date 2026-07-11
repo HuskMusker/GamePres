@@ -279,7 +279,7 @@ a:hover {
 
 /* 🔽 ИЗМЕНЁННЫЙ БЛОК: добавлен фон для полей ввода */
 textarea, input[type="text"], input[type="password"], input[type="email"] {
-    max-width: 1000px !important;
+    max-width: 100% !important;
     width: 100% !important;
     padding: 8px 0 !important;
     font-size: 0.95rem !important;
