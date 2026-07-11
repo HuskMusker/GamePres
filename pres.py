@@ -990,7 +990,7 @@ elif st.session_state.page == "module12":
             <li><strong>📜 Закон № 149-ФЗ</strong> — регулирует цифровую среду, определяет субъектов.</li>
             <li><strong>🛡️ Закон № 152-ФЗ</strong> — защищает персональные данные.</li>
             <li><strong>⚖️ Этика</strong> — свод правил: информированное согласие, конфиденциальность, "не навреди".</li>
-            <li><strong>🔒 Ваша ответственность</strong> — ты отвечаешь за сохранность данных клиентов.</li>
+            <li><strong>🔒 Твоя ответственность</strong> — ты отвечаешь за сохранность данных клиентов.</li>
           </ul>
         </div>
         """, unsafe_allow_html=True)
@@ -1024,7 +1024,7 @@ elif st.session_state.page == "module12":
                     st.warning(f"📚 Рекомендуем вернуться к материалам, особенно к: {', '.join(missing)}.")
         st.markdown("---")
         st.markdown("### 🔢 Финальное задание: мост к практике")
-        st.write("Оцени безопасность вашего текущего пароля (от личного аккаунта) по шкале от 1 до 10 и обоснуй оценку в 2–3 предложениях.")
+        st.write("Оцени безопасность твоего текущего пароля (от личного аккаунта) по шкале от 1 до 10 и обоснуй оценку в 2–3 предложениях.")
         col1, col2 = st.columns([1, 3])
         with col1:
             score = st.slider("Оценка (1–10)", 1, 10, key="final_score_slider")
@@ -1350,7 +1350,7 @@ elif st.session_state.page == "module13":
                 "D": "Игнорировать ситуацию и переключиться на другой вопрос клиента."
             }
             choice = st.radio(
-                "Ваш выбор:",
+                "Твой выбор:",
                 case_options.keys(),
                 format_func=lambda x: f"{x}: {case_options[x]}",
                 key="m13_case_choice"
@@ -1366,10 +1366,10 @@ elif st.session_state.page == "module13":
                     st.error("❌ Недопустимо! Игнорирование ситуации — нарушение профессиональной обязанности.")
             st.markdown("#### Объясни, почему ты выбрал именно этот вариант.")
             st.markdown("*Ссылайся на конкретные законы или этические принципы из раздела 1.2.*")
-            justification = st.text_area("Ваше обоснование (3–5 предложений):", key="m13_case_justification", height=100, placeholder="Введи обоснование...")
+            justification = st.text_area("Твое обоснование (3–5 предложений):", key="m13_case_justification", height=100, placeholder="Введи обоснование...")
             if st.button("📤 Отправить на проверку наставнику", key="send_case"):
                 st.session_state.m13_case_sent = True
-                st.success("✅ Ваш ответ отправлен на проверку. Ты можешь перейти к следующему блоку.")
+                st.success("✅ Твой ответ отправлен на проверку. Ты можешь перейти к следующему блоку.")
                 st.rerun()
         else:
             st.success("✅ Кейс отправлен на проверку.")
@@ -1416,12 +1416,12 @@ elif st.session_state.page == "module13":
                 for i, item in enumerate(project_checklist_items):
                     st.session_state.m13_project_checklist[i] = st.checkbox(item, key=f"m13_proj_check_{i}")
 
-            project_text = st.text_area("Введи текст вашего пакета рекомендаций:", height=400, key="m13_project_text", placeholder="Начни писать...")
+            project_text = st.text_area("Введи текст твоего пакета рекомендаций:", height=400, key="m13_project_text", placeholder="Начни писать...")
             if project_text:
                 st.session_state.m13_project = project_text
             if st.button("📤 Сохранить проект и отправить на проверку наставнику", key="send_project"):
                 st.session_state.m13_project_sent = True
-                st.success("✅ Ваш проект сохранён и отправлен на проверку. Ты можешь перейти к диагностике.")
+                st.success("✅ Твой проект сохранён и отправлен на проверку. Ты можешь перейти к диагностике.")
                 st.rerun()
         else:
             st.success("✅ Проект отправлен на проверку.")
@@ -1441,7 +1441,7 @@ elif st.session_state.page == "module13":
         st.markdown("""
         <div class="theory-card">
           <p>Ты почти завершил модуль. Теперь проверь, как ты усвоил материал. В этом задании нужно применить все полученные знания: и правовые (раздел 1.2), и практические (раздел 1.3).</p>
-          <p><strong>Ситуация:</strong> К тебе пришёл клиент — ваш друг, который активно пользуется интернетом. Он говорит:</p>
+          <p><strong>Ситуация:</strong> К тебе пришёл клиент — твой друг, который активно пользуется интернетом. Он говорит:</p>
           <blockquote>
             "Мне пришло письмо от Госуслуг, что мой аккаунт взломали. Я сменил пароль, но мне всё равно страшно. Я не знаю, что ещё сделать, чтобы защитить себя."
           </blockquote>
@@ -1476,15 +1476,15 @@ elif st.session_state.page == "module13":
                 st.session_state.timer_active = False
 
         st.markdown("#### 1. Какие угрозы присутствуют?")
-        threats = st.text_area("Ваш ответ (3–5 предложений):", key="m13_diag_threats", height=100, placeholder="Опишите угрозы...")
+        threats = st.text_area("Твой ответ (3–5 предложений):", key="m13_diag_threats", height=100, placeholder="Опишите угрозы...")
         st.markdown("#### 2. Какие права есть у клиента по закону № 152-ФЗ?")
-        rights = st.text_area("Ваш ответ (3–5 предложений):", key="m13_diag_rights", height=100, placeholder="Права клиента...")
+        rights = st.text_area("Твой ответ (3–5 предложений):", key="m13_diag_rights", height=100, placeholder="Права клиента...")
         st.markdown("#### 3. Пошаговый план действий (не менее 5 шагов)")
-        plan = st.text_area("Ваш план (маркированный список):", key="m13_diag_plan", height=120, placeholder="1. ...\n2. ...")
+        plan = st.text_area("Твой план (маркированный список):", key="m13_diag_plan", height=120, placeholder="1. ...\n2. ...")
         st.markdown("#### 4. Сообщение клиенту (от имени куратора)")
-        message = st.text_area("Ваше сообщение (5–8 предложений):", key="m13_diag_message", height=120, placeholder="Здравствуйте! ...")
+        message = st.text_area("Твое сообщение (5–8 предложений):", key="m13_diag_message", height=120, placeholder="Здравствуйте! ...")
         st.markdown("#### 5. Какие этические принципы ты соблюдаешь?")
-        ethics = st.text_area("Ваш ответ (3–5 предложений):", key="m13_diag_ethics", height=100, placeholder="Конфиденциальность, ...")
+        ethics = st.text_area("Твой ответ (3–5 предложений):", key="m13_diag_ethics", height=100, placeholder="Конфиденциальность, ...")
 
         st.markdown("#### Чек-лист самопроверки (отметь перед отправкой)")
         diag_checks = [
@@ -1573,7 +1573,7 @@ elif st.session_state.page == "diagnostics":
         level = "🏅 Начинающий куратор"
         advice = "Тебе стоит вернуться к материалам обоих модулей и пройти курс заново для закрепления."
 
-    st.markdown(f"**Ваш уровень:** {level}")
+    st.markdown(f"**Твой уровень:** {level}")
     st.success(f"💡 {advice}")
 
     # Экспорт ответов
