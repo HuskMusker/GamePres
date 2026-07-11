@@ -22,7 +22,7 @@ st.markdown(
     """
 <style>
 :root {
-    --bg-primary: #201E4A;
+    --bg-primary: #1C1A3B;
     --bg-card: rgba(255, 255, 255, 0.05);
     --bg-card-hover: rgba(255, 255, 255, 0.08);
     --border-card: rgba(255, 255, 255, 0.06);
