@@ -1191,7 +1191,7 @@ elif st.session_state.page == "module13":
             # Открываем центрирующий контейнер
             st.markdown('<div class="sort-row-wrapper">', unsafe_allow_html=True)
         
-            col_empty_left, col1, col2, col3, col_empty_right = st.columns([3, 0.5, 2, 0.5, 3])
+            col_empty_left, col1, col2, col3, col_empty_right = st.columns([3, 0.2, 2, 0.2, 3])
             
             with col1:
                 if st.button("◀", key=f"left_{sid}"):
