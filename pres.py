@@ -48,6 +48,8 @@ st.markdown(
     --radius-button: 100px;
     --transition-speed: 0.25s;
     --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    /* Добавляем переменную для фона полей ввода */
+    --input-bg: rgba(255, 255, 255, 0.07);
 }
 
 .stApp {
@@ -58,7 +60,6 @@ st.markdown(
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
-
 
 @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(24px); }
@@ -276,14 +277,14 @@ a:hover {
     padding-top: 0.8rem !important;
 }
 
-/* Компактные подчёркнутые поля ввода (только нижняя линия) */
+/* 🔽 ИЗМЕНЁННЫЙ БЛОК: добавлен фон для полей ввода */
 textarea, input[type="text"], input[type="password"], input[type="email"] {
     max-width: 600px !important;
     width: 100% !important;
     padding: 8px 0 !important;
     font-size: 0.95rem !important;
     line-height: 1.4 !important;
-    background: transparent !important;
+    background: var(--input-bg) !important;   /* <-- теперь фон не прозрачный */
     border: none !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
     border-radius: 0 !important;
