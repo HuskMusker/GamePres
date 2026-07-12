@@ -732,7 +732,7 @@ elif st.session_state.page == "module12":
         </div>
         """, unsafe_allow_html=True)
         st.markdown("### 🎥 Видео")
-        col1, col2, col3 = st.columns([0.5, 2, 0.5])
+        col1, col2, col3 = st.columns([0.3, 2, 0.3])
         with col2:
             st.video("VidPlaceHold.mp4")
         st.markdown("---")
@@ -1125,7 +1125,7 @@ elif st.session_state.page == "module13":
         </div>
         """, unsafe_allow_html=True)
         st.markdown("### 🎥 Видео-воспоминание")
-        col1, col2, col3 = st.columns([0.5, 2, 0.5])
+        col1, col2, col3 = st.columns([0.3, 2, 0.3])
         with col2:
             st.video("VidPlaceHold.mp4")
         render_nav_buttons(None, 1, False, back_label=None, next_label="Начать проект ➡️")
