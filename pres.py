@@ -51,7 +51,7 @@ st.markdown(
         z-index: -2;               /* позади оверлея и контента */
         object-fit: cover;
         pointer-events: none;
-        transform: scale(1.2);          /* ← увеличение масштаба на 20 % */
+        transform: scale(2);          /* ← увеличение масштаба на 20 % */
         transform-origin: center center; /* не обязательно, но для ясности */
     }}
     /* Монохромный полупрозрачный слой ПЕРЕД фоновым изображением */
