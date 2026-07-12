@@ -45,8 +45,8 @@ st.markdown(
         position: fixed;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
+        width: 200%;
+        height: 200%;
         opacity: 1;               /* изображение полностью видимо */
         z-index: -2;               /* позади оверлея и контента */
         object-fit: cover;
