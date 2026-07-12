@@ -30,7 +30,7 @@ st.markdown(
         pointer-events: none;   /* клики проходят сквозь картинку */
     }
     </style>
-    <img class="bg-image" src="bgg.png" alt="background">
+    <img class="bg-image" src="bg.png" alt="background">
     """,
     unsafe_allow_html=True
 )
