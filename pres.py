@@ -83,40 +83,7 @@ else:
     """
 st.markdown(bg_style, unsafe_allow_html=True)
 
-st.markdown(
-    f"""
-    <style>
-    /* Фоновое изображение */
-    .bg-image {{
-        position: fixed;
-        background-attachment: fixed; 
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        opacity: 1;               /* изображение полностью видимо */
-        z-index: -2;               /* позади оверлея и контента */
-        object-fit: cover;
-        pointer-events: none;
-        transform: scale(2);          /* ← увеличение масштаба на 20 % */
-        transform-origin: center center; /* не обязательно, но для ясности */
-    }}
-    /* Монохромный полупрозрачный слой ПЕРЕД фоновым изображением */
-    .bg-overlay {{
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(17, 14, 31, 0.7);  /* монохромный (тёмно-фиолетовый) полупрозрачный фон */
-        z-index: -1;               /* выше картинки, но ниже контента */
-        pointer-events: none;
-    }}
-    </style>
-    <div class="bg-overlay"></div>
-    """,
-    unsafe_allow_html=True
-)
+
 
 # Якорь и скрипт для гарантированной прокрутки вверх при каждом rerun
 st.markdown('<div id="top"></div>', unsafe_allow_html=True)
@@ -156,7 +123,7 @@ st.markdown(
 }
 
 .stApp {
-    background: var(--bg-primary);
+    background: transparent; 
     color: var(--text-primary);
     font-family: var(--font-family);
     line-height: 1.6;
