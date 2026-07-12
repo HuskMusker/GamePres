@@ -32,10 +32,56 @@ st.set_page_config(
 # Вставка фонового изображения через base64
 base64_img = get_base64_image("bg.png")  # файл bg.png должен быть в папке с приложением
 if base64_img:
-    bg_image_tag = f'<img class="bg-image" src="data:image/png;base64,{base64_img}" alt="background">'
+        # CSS-правила: фон через body, оверлей поверх, контент сверху
+    bg_style = f"""
+    <style>
+    /* Убираем старый .bg-image */
+    body {{
+        background-image: url("data:image/png;base64,{base64_img}");
+        background-size: 120%;               /* масштаб: 100% = оригинал, >100% = зум; можно auto 120% и т.п. */
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;        /* фиксация при скролле */
+        margin: 0;
+        padding: 0;
+    }}
+    /* Оверлей остаётся поверх фона */
+    .bg-overlay {{
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background-color: rgba(17, 14, 31, 0.7);
+        z-index: 0;                         /* выше body-фона, но ниже контента */
+        pointer-events: none;
+    }}
+    /* Поднимаем контент над оверлеем */
+    .block-container {{
+        position: relative;
+        z-index: 1;
+    }}
+    </style>
+    <div class="bg-overlay"></div>
+    """
 else:
-    # Если файл не найден – пустой тег (можно заменить на прозрачный пиксель)
-    bg_image_tag = '<img class="bg-image" src="" alt="background">'
+    # Если файла нет – только затемнённый фон
+    bg_style = """
+    <style>
+    .bg-overlay {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background-color: rgba(17, 14, 31, 0.7);
+        z-index: 0;
+        pointer-events: none;
+    }
+    .block-container {
+        position: relative;
+        z-index: 1;
+    }
+    </style>
+    <div class="bg-overlay"></div>
+    """
+st.markdown(bg_style, unsafe_allow_html=True)
 
 st.markdown(
     f"""
