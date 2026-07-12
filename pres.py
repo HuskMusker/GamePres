@@ -43,6 +43,7 @@ st.markdown(
     /* Фоновое изображение */
     .bg-image {{
         position: fixed;
+        background-attachment: fixed; 
         top: 0;
         left: 0;
         width: 100%;
