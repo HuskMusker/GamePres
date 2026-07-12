@@ -18,19 +18,32 @@ st.set_page_config(
 st.markdown(
     """
     <style>
+    /* Фоновое изображение */
     .bg-image {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        opacity: 1;          /* регулируйте видимость (0 – невидимо, 1 – полностью) */
-        z-index: -1;            /* отправляет картинку за весь контент */
-        object-fit: cover;      /* заполняет экран с сохранением пропорций */
-        pointer-events: none;   /* клики проходят сквозь картинку */
+        opacity: 1;               /* изображение полностью видимо */
+        z-index: -2;               /* позади оверлея и контента */
+        object-fit: cover;
+        pointer-events: none;
+    }
+    /* Монохромный полупрозрачный слой ПЕРЕД фоновым изображением */
+    .bg-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(17, 14, 31, 0.7);  /* монохромный (тёмно-фиолетовый) полупрозрачный фон */
+        z-index: -1;               /* выше картинки, но ниже контента */
+        pointer-events: none;
     }
     </style>
     <img class="bg-image" src="bg.png" alt="background">
+    <div class="bg-overlay"></div>
     """,
     unsafe_allow_html=True
 )
