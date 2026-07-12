@@ -4,6 +4,8 @@ import json
 import time
 import pandas as pd
 import streamlit.components.v1 as components
+import base64
+from pathlib import Path
 
 # ------------------------------
 # Настройка страницы
@@ -15,11 +17,24 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# ---- ВСТРОЕННОЕ ФОНОВОЕ ИЗОБРАЖЕНИЕ + ПОЛУПРОЗРАЧНЫЙ МОНОХРОМНЫЙ СЛОЙ ----
+def img_to_bytes(img_path):
+    try:
+        img_bytes = Path(img_path).read_bytes()
+        encoded = base64.b64encode(img_bytes).decode()
+        return f"data:image/png;base64,{encoded}"
+    except FileNotFoundError:
+        return None
+
+img_src = img_to_bytes("bg.png")  # файл bg.png должен лежать рядом со скриптом
+
+
+if img_src:
 st.markdown(
     """
     <style>
     /* Фоновое изображение */
-    .bg-image {
+    .bg-image {{
         position: fixed;
         top: 0;
         left: 0;
@@ -29,9 +44,9 @@ st.markdown(
         z-index: -2;               /* позади оверлея и контента */
         object-fit: cover;
         pointer-events: none;
-    }
+    }}
     /* Монохромный полупрозрачный слой ПЕРЕД фоновым изображением */
-    .bg-overlay {
+    .bg-overlay {{
         position: fixed;
         top: 0;
         left: 0;
@@ -40,13 +55,34 @@ st.markdown(
         background-color: rgba(17, 14, 31, 0.7);  /* монохромный (тёмно-фиолетовый) полупрозрачный фон */
         z-index: -1;               /* выше картинки, но ниже контента */
         pointer-events: none;
-    }
+    }}
     </style>
     <img class="bg-image" src="bg.png" alt="background">
     <div class="bg-overlay"></div>
     """,
     unsafe_allow_html=True
 )
+
+else:
+    # Если файл не найден, только полупрозрачный фон
+    st.markdown(
+        """
+        <style>
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(17, 14, 31, 0.7);
+            z-index: -1;
+            pointer-events: none;
+        }
+        </style>
+        <div class="bg-overlay"></div>
+        """,
+        unsafe_allow_html=True
+    )
 
 # Якорь и скрипт для гарантированной прокрутки вверх при каждом rerun
 st.markdown('<div id="top"></div>', unsafe_allow_html=True)
@@ -86,7 +122,7 @@ st.markdown(
 }
 
 .stApp {
-    background: var(--bg-primary);
+    background: transparent !important;
     color: var(--text-primary);
     font-family: var(--font-family);
     line-height: 1.6;
