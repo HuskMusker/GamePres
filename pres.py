@@ -41,7 +41,9 @@ if base64_img:
         background-size: 120%;               /* масштаб: 100% = оригинал, >100% = зум; можно auto 120% и т.п. */
         background-position: center;
         background-repeat: no-repeat;
-        background-attachment: fixed;        /* фиксация при скролле */
+        background-attachment: fixed; 
+        filter: blur(8px);
+        /* фиксация при скролле */
         margin: 0;
         padding: 0;
     }}
@@ -50,7 +52,7 @@ if base64_img:
         position: fixed;
         top: 0; left: 0;
         width: 100%; height: 100%;
-        background-color: rgba(17, 14, 31, 0.97);
+        background-color: rgba(17, 14, 31, 0.94);
         z-index: 0;                         /* выше body-фона, но ниже контента */
         pointer-events: none;
     }}
