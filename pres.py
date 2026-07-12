@@ -4,8 +4,6 @@ import json
 import time
 import pandas as pd
 import streamlit.components.v1 as components
-import base64
-from pathlib import Path
 
 # ------------------------------
 # Настройка страницы
@@ -17,42 +15,34 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ---- ВСТРОЕННОЕ ФОНОВОЕ ИЗОБРАЖЕНИЕ + ПОЛУПРОЗРАЧНЫЙ МОНОХРОМНЫЙ СЛОЙ ----
-def img_to_bytes(img_path):
-    img_bytes = Path(img_path).read_bytes()
-    encoded = base64.b64encode(img_bytes).decode()
-    return encoded
-
-img_base64 = img_to_bytes("bg.png")   # файл bg.png должен лежать рядом со скриптом
-
 st.markdown(
-    f"""
+    """
     <style>
-    /* фоновое изображение на весь экран, фиксированное */
-    .bg-image {{
+    /* Фоновое изображение */
+    .bg-image {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        opacity: 1;
-        z-index: -2;
+        opacity: 1;               /* изображение полностью видимо */
+        z-index: -2;               /* позади оверлея и контента */
         object-fit: cover;
         pointer-events: none;
-    }}
-    /* полупрозрачный монохромный слой ПЕРЕД картинкой */
-    .bg-overlay {{
+    }
+    /* Монохромный полупрозрачный слой ПЕРЕД фоновым изображением */
+    .bg-overlay {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(17, 14, 31, 0.7);   /* ваш фирменный тёмный цвет, 70% непрозрачности */
-        z-index: -1;
+        background-color: rgba(17, 14, 31, 0.7);  /* монохромный (тёмно-фиолетовый) полупрозрачный фон */
+        z-index: -1;               /* выше картинки, но ниже контента */
         pointer-events: none;
-    }}
+    }
     </style>
-    <img class="bg-image" src="data:image/png;base64,{img_base64}" alt="background">
+    <img class="bg-image" src="bg.png" alt="background">
     <div class="bg-overlay"></div>
     """,
     unsafe_allow_html=True
@@ -66,6 +56,8 @@ var el = document.getElementById('top');
 if (el) el.scrollIntoView({behavior: 'instant'});
 </script>
 """, height=0)
+
+
 
 # ------------------------------
 # CSS (лёгкие подчёркнутые поля, улучшенная типографика)
@@ -89,12 +81,12 @@ st.markdown(
     --radius-button: 100px;
     --transition-speed: 0.25s;
     --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    /* Добавляем переменную для фона полей ввода */
     --input-bg: rgba(21, 28, 49, 1);
 }
 
-/* ★★★ ГЛАВНОЕ ИСПРАВЛЕНИЕ: делаем основной фон прозрачным, чтобы были видны фоновое изображение и оверлей ★★★ */
 .stApp {
-    background: transparent !important;
+    background: var(--bg-primary);
     color: var(--text-primary);
     font-family: var(--font-family);
     line-height: 1.6;
