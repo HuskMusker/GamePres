@@ -15,22 +15,36 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Фоновые слои
 st.markdown(
     """
     <style>
-    .bg-image {
+    /* Картинка на заднем плане */
+    .bg-picture {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        opacity: 0.15;
-        z-index: -1;
         object-fit: cover;
+        z-index: 0;
+        opacity: 0.2; /* регулируйте видимость */
+        pointer-events: none;
+    }
+    /* Полупрозрачный тёмный оверлей */
+    .bg-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(17, 14, 31, 0.85); /* ваш #110E1F с прозрачностью */
+        z-index: 1;
         pointer-events: none;
     }
     </style>
-    <img class="bg-image" src="bg.png" alt="background">
+    <img class="bg-picture" src="bg.png" alt="background">
+    <div class="bg-overlay"></div>
     """,
     unsafe_allow_html=True
 )
@@ -73,12 +87,14 @@ st.markdown(
 }
 
 .stApp {
-    background: var(--bg-primary);
+    background: transparent !important;
     color: var(--text-primary);
     font-family: var(--font-family);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    position: relative;
+    z-index: 2; /* весь контент будет выше фоновых слоёв */
 }
 
 @keyframes fadeInUp {
