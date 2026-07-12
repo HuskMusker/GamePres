@@ -1123,13 +1123,7 @@ elif st.session_state.page == "module13":
         </div>
         """, unsafe_allow_html=True)
         st.markdown("### 🎥 Видео-воспоминание")
-        st.markdown("""
-        <div style="background: rgba(255,255,255,0.03); border-radius: 16px; padding: 2rem; text-align: center; border: 1px dashed var(--border-card);">
-          <div style="font-size: 2rem; margin-bottom: 0.5rem;">▶️</div>
-          <p style="color: var(--text-muted);">Анимация «Вспомним законы» будет вставлена здесь</p>
-          <span style="font-size:0.9rem; color: var(--text-muted);">(статичная заглушка)</span>
-        </div>
-        """, unsafe_allow_html=True)
+        st.video("VidPlaceHold.mp4")
         render_nav_buttons(None, 1, False, back_label=None, next_label="Начать проект ➡️")
 
     elif step == 1:
