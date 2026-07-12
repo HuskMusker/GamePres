@@ -113,7 +113,6 @@ st.markdown(
         pointer-events: none;
     }}
     </style>
-    {bg_image_tag}
     <div class="bg-overlay"></div>
     """,
     unsafe_allow_html=True
