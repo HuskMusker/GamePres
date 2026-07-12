@@ -15,46 +15,22 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# === НОВАЯ РЕАЛИЗАЦИЯ ФОНА (КАРТИНКА + ОВЕРЛЕЙ) ===
 st.markdown(
     """
     <style>
-    /* Картинка на заднем плане */
-    .bg-picture {
+    .bg-image {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        object-fit: cover;
-        z-index: 0;
-        opacity: 1;               /* можно регулировать прозрачность самой картинки */
-        pointer-events: none;
-    }
-    /* Полупрозрачный тёмный оверлей поверх картинки */
-    .bg-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(17, 14, 31, 0.85); /* ваш основной цвет #110E1F с прозрачностью */
-        z-index: 1;
-        pointer-events: none;
-    }
-    /* Делаем body прозрачным, чтобы были видны слои */
-    body {
-        background: transparent !important;
-    }
-    /* Контейнер приложения – прозрачный фон, но выше слоёв */
-    .stApp {
-        background: transparent !important;
-        position: relative;
-        z-index: 2;
+        opacity: 1;          /* регулируйте видимость (0 – невидимо, 1 – полностью) */
+        z-index: -1;            /* отправляет картинку за весь контент */
+        object-fit: cover;      /* заполняет экран с сохранением пропорций */
+        pointer-events: none;   /* клики проходят сквозь картинку */
     }
     </style>
-    <img class="bg-picture" src="bg.png" alt="background">
-    <div class="bg-overlay"></div>
+    <img class="bg-image" src="bg.png" alt="background">
     """,
     unsafe_allow_html=True
 )
@@ -68,8 +44,10 @@ if (el) el.scrollIntoView({behavior: 'instant'});
 </script>
 """, height=0)
 
+
+
 # ------------------------------
-# CSS (основные стили, скорректирована .stApp)
+# CSS (лёгкие подчёркнутые поля, улучшенная типографика)
 # ------------------------------
 st.markdown(
     """
@@ -90,12 +68,12 @@ st.markdown(
     --radius-button: 100px;
     --transition-speed: 0.25s;
     --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    /* Добавляем переменную для фона полей ввода */
     --input-bg: rgba(21, 28, 49, 1);
 }
 
-/* Убираем фоновый цвет и делаем прозрачным (уже задано выше, но для надёжности) */
 .stApp {
-    background: transparent !important;
+    background: var(--bg-primary);
     color: var(--text-primary);
     font-family: var(--font-family);
     line-height: 1.6;
@@ -137,9 +115,10 @@ h2, h3, h4 {
 /* Обёртка для центрирования всего ряда */
 .sort-row-wrapper {
     display: flex;
-    justify-content: center;
-    margin: 0.5rem 0;
+    justify-content: center;      /* горизонтальное центрирование */
+    margin: 0.5rem 0;            /* небольшой вертикальный отступ */
 }
+/* Отключаем растягивание st.columns на всю ширину */
 .sort-row-wrapper .stHorizontalBlock {
     width: auto !important;
     flex: 0 0 auto !important;
@@ -199,6 +178,7 @@ h2, h3, h4 {
     box-shadow: none;
 }
 
+/* Кнопка "Назад" в nav-container */
 .nav-container > div:first-child .stButton button {
     background: rgba(255, 255, 255, 0.15);
     border: 1px solid rgba(255, 255, 255, 0.5);
@@ -329,13 +309,14 @@ a:hover {
     padding-top: 0.8rem !important;
 }
 
+/* 🔽 ИЗМЕНЁННЫЙ БЛОК: добавлен фон для полей ввода */
 textarea, input[type="text"], input[type="password"], input[type="email"] {
     max-width: 100% !important;
     width: 100% !important;
     padding: 8px 0 !important;
     font-size: 0.95rem !important;
     line-height: 1.4 !important;
-    background: var(--input-bg) !important;
+    background: var(--input-bg) !important;   /* <-- теперь фон не прозрачный */
     border: none !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
     border-radius: 8px !important;
