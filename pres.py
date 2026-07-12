@@ -17,16 +17,18 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# ---- ВСТРОЕННОЕ ФОНОВОЕ ИЗОБРАЖЕНИЕ + ПОЛУПРОЗРАЧНЫЙ МОНОХРОМНЫЙ СЛОЙ ----
 def img_to_bytes(img_path):
     img_bytes = Path(img_path).read_bytes()
     encoded = base64.b64encode(img_bytes).decode()
     return encoded
 
-# Замените старый блок с bg-image на:
-img_base64 = img_to_bytes("bg.png")
+img_base64 = img_to_bytes("bg.png")   # файл bg.png должен лежать рядом со скриптом
+
 st.markdown(
     f"""
     <style>
+    /* фоновое изображение на весь экран, фиксированное */
     .bg-image {{
         position: fixed;
         top: 0;
@@ -38,13 +40,14 @@ st.markdown(
         object-fit: cover;
         pointer-events: none;
     }}
+    /* полупрозрачный монохромный слой ПЕРЕД картинкой */
     .bg-overlay {{
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(17, 14, 31, 0.7);
+        background-color: rgba(17, 14, 31, 0.7);   /* ваш фирменный тёмный цвет, 70% непрозрачности */
         z-index: -1;
         pointer-events: none;
     }}
@@ -63,8 +66,6 @@ var el = document.getElementById('top');
 if (el) el.scrollIntoView({behavior: 'instant'});
 </script>
 """, height=0)
-
-
 
 # ------------------------------
 # CSS (лёгкие подчёркнутые поля, улучшенная типографика)
@@ -88,12 +89,12 @@ st.markdown(
     --radius-button: 100px;
     --transition-speed: 0.25s;
     --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    /* Добавляем переменную для фона полей ввода */
     --input-bg: rgba(21, 28, 49, 1);
 }
 
+/* ★★★ ГЛАВНОЕ ИСПРАВЛЕНИЕ: делаем основной фон прозрачным, чтобы были видны фоновое изображение и оверлей ★★★ */
 .stApp {
-    background: var(--bg-primary);
+    background: transparent !important;
     color: var(--text-primary);
     font-family: var(--font-family);
     line-height: 1.6;
