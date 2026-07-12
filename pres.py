@@ -32,30 +32,27 @@ st.set_page_config(
 # Вставка фонового изображения через base64
 base64_img = get_base64_image("bg2.png")  # файл bg.png должен быть в папке с приложением
 if base64_img:
-        # CSS-правила: фон через body, оверлей поверх, контент сверху
+    # CSS-правила: фон через body, оверлей поверх, контент сверху
     bg_style = f"""
     <style>
     /* Убираем старый .bg-image */
     body {{
         background-image: url("data:image/png;base64,{base64_img}");
-        background-size: 120%;               /* масштаб: 100% = оригинал, >100% = зум; можно auto 120% и т.п. */
+        background-size: 120%;
         background-position: center;
         background-repeat: no-repeat;
-        background-attachment: fixed;  
-        /* фиксация при скролле */
+        background-attachment: fixed;
         margin: 0;
         padding: 0;
     }}
-    /* Оверлей остаётся поверх фона */
     .bg-overlay {{
         position: fixed;
         top: 0; left: 0;
         width: 100%; height: 100%;
         background-color: rgba(17, 14, 31, 0.97);
-        z-index: 0;                         /* выше body-фона, но ниже контента */
+        z-index: 0;
         pointer-events: none;
     }}
-    /* Поднимаем контент над оверлеем */
     .block-container {{
         position: relative;
         z-index: 1;
@@ -64,7 +61,6 @@ if base64_img:
     <div class="bg-overlay"></div>
     """
 else:
-    # Если файла нет – только затемнённый фон
     bg_style = """
     <style>
     .bg-overlay {
@@ -84,8 +80,6 @@ else:
     """
 st.markdown(bg_style, unsafe_allow_html=True)
 
-
-
 # Якорь и скрипт для гарантированной прокрутки вверх при каждом rerun
 st.markdown('<div id="top"></div>', unsafe_allow_html=True)
 components.html("""
@@ -95,10 +89,8 @@ if (el) el.scrollIntoView({behavior: 'instant'});
 </script>
 """, height=0)
 
-
-
 # ------------------------------
-# CSS (лёгкие подчёркнутые поля, улучшенная типографика)
+# CSS (лёгкие подчёркнутые поля, улучшенная типографика + анимации при наведении)
 # ------------------------------
 st.markdown(
     """
@@ -119,12 +111,11 @@ st.markdown(
     --radius-button: 100px;
     --transition-speed: 0.25s;
     --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    /* Добавляем переменную для фона полей ввода */
     --input-bg: rgba(21, 28, 49, 1);
 }
 
 .stApp {
-    background: transparent; 
+    background: transparent;
     color: var(--text-primary);
     font-family: var(--font-family);
     line-height: 1.6;
@@ -166,10 +157,9 @@ h2, h3, h4 {
 /* Обёртка для центрирования всего ряда */
 .sort-row-wrapper {
     display: flex;
-    justify-content: center;      /* горизонтальное центрирование */
-    margin: 0.5rem 0;            /* небольшой вертикальный отступ */
+    justify-content: center;
+    margin: 0.5rem 0;
 }
-/* Отключаем растягивание st.columns на всю ширину */
 .sort-row-wrapper .stHorizontalBlock {
     width: auto !important;
     flex: 0 0 auto !important;
@@ -360,25 +350,49 @@ a:hover {
     padding-top: 0.8rem !important;
 }
 
-/* 🔽 ИЗМЕНЁННЫЙ БЛОК: добавлен фон для полей ввода */
+/* Текстовые поля и textarea – основной стиль */
 textarea, input[type="text"], input[type="password"], input[type="email"] {
     max-width: 100% !important;
     width: 100% !important;
     padding: 8px 0 !important;
     font-size: 0.95rem !important;
     line-height: 1.4 !important;
-    background: var(--input-bg) !important;   /* <-- теперь фон не прозрачный */
+    background: var(--input-bg) !important;
     border: none !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
     border-radius: 8px !important;
     color: #FFFFFF !important;
-    transition: all var(--transition-speed);
+    transition: all var(--transition-speed) cubic-bezier(0.2, 0.9, 0.3, 1); /* единый transition */
+}
+/* Анимация при наведении на текстовые поля */
+textarea:hover, input[type="text"]:hover, input[type="password"]:hover, input[type="email"]:hover {
+    background: rgba(21, 28, 49, 0.9) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border-bottom-color: var(--accent-cyan) !important;
 }
 textarea:focus, input:focus {
     border-bottom-color: var(--accent-cyan) !important;
     outline: none !important;
     box-shadow: 0 1px 0 0 var(--accent-cyan) !important;
 }
+
+/* Анимация при наведении на selectbox (списки) */
+.stSelectbox > div:first-child {
+    transition: all var(--transition-speed) cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+.stSelectbox:hover > div:first-child {
+    background: var(--bg-card-hover);
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-2px);
+}
+
+/* Анимация для radio и checkbox – подсветка строки при наведении */
+.stRadio > div:hover, .stCheckbox > div:hover {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    transition: background var(--transition-speed);
+}
+
 .stTextArea label, .stTextInput label {
     color: var(--text-secondary) !important;
     font-weight: 500;
@@ -428,6 +442,7 @@ div[data-testid="stAlert"][data-kind="info"] {
     border-left-color: var(--accent-cyan) !important;
 }
 
+/* Блок-подсказка (bridge-block) – анимация при наведении */
 .bridge-block {
     background: rgba(64, 196, 255, 0.08);
     border-left: 4px solid var(--accent-cyan);
@@ -436,9 +451,30 @@ div[data-testid="stAlert"][data-kind="info"] {
     margin: 1.5rem 0 1rem 0;
     color: #E0E0E0;
     backdrop-filter: blur(4px);
+    transition: all var(--transition-speed) cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+.bridge-block:hover {
+    background: rgba(64, 196, 255, 0.12);
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-2px);
 }
 .bridge-block strong {
     color: var(--accent-cyan);
+}
+
+/* Надписи (score-display, badge) – лёгкая анимация при наведении */
+.score-display {
+    transition: transform var(--transition-speed);
+}
+.score-display:hover {
+    transform: scale(1.02);
+}
+.badge {
+    transition: all var(--transition-speed);
+}
+.badge:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.2);
 }
 
 .step-indicator {
