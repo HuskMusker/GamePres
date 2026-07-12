@@ -732,6 +732,8 @@ elif st.session_state.page == "module12":
         </div>
         """, unsafe_allow_html=True)
         st.markdown("### 🎥 Видео")
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
         st.video("VidPlaceHold.mp4")
         st.markdown("---")
         st.markdown("### ❓ Вопрос")
