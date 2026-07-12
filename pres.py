@@ -15,6 +15,26 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+st.markdown(
+    """
+    <style>
+    .bg-image {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0.15;          /* регулируйте видимость (0 – невидимо, 1 – полностью) */
+        z-index: -1;            /* отправляет картинку за весь контент */
+        object-fit: cover;      /* заполняет экран с сохранением пропорций */
+        pointer-events: none;   /* клики проходят сквозь картинку */
+    }
+    </style>
+    <img class="bg-image" src="bgg.png" alt="background">
+    """,
+    unsafe_allow_html=True
+)
+
 # Якорь и скрипт для гарантированной прокрутки вверх при каждом rerun
 st.markdown('<div id="top"></div>', unsafe_allow_html=True)
 components.html("""
@@ -53,8 +73,7 @@ st.markdown(
 }
 
 .stApp {
-    background:linear-gradient(rgba(17,14,31,0.85), rgba(17,14,31,0.85)),
-    url('bg.png') center/cover no-repeat fixed;
+    background: var(--bg-primary);
     color: var(--text-primary);
     font-family: var(--font-family);
     line-height: 1.6;
