@@ -42,7 +42,7 @@ if base64_img:
         background-position: center;
         background-repeat: no-repeat;
         background-attachment: fixed; 
-        filter: blur(2px); 
+        filter: blur(0px); 
         /* фиксация при скролле */
         margin: 0;
         padding: 0;
