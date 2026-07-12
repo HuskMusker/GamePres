@@ -4,6 +4,20 @@ import json
 import time
 import pandas as pd
 import streamlit.components.v1 as components
+import base64
+from pathlib import Path
+
+# ------------------------------
+# Функция для получения base64 изображения
+# ------------------------------
+@st.cache_data
+def get_base64_image(image_path):
+    """Читает локальный файл и возвращает base64-строку для data URI."""
+    try:
+        with open(image_path, "rb") as img_file:
+            return base64.b64encode(img_file.read()).decode()
+    except FileNotFoundError:
+        return None
 
 # ------------------------------
 # Настройка страницы
@@ -15,11 +29,19 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Вставка фонового изображения через base64
+base64_img = get_base64_image("bg.png")  # файл bg.png должен быть в папке с приложением
+if base64_img:
+    bg_image_tag = f'<img class="bg-image" src="data:image/png;base64,{base64_img}" alt="background">'
+else:
+    # Если файл не найден – пустой тег (можно заменить на прозрачный пиксель)
+    bg_image_tag = '<img class="bg-image" src="" alt="background">'
+
 st.markdown(
-    """
+    f"""
     <style>
     /* Фоновое изображение */
-    .bg-image {
+    .bg-image {{
         position: fixed;
         top: 0;
         left: 0;
@@ -29,9 +51,9 @@ st.markdown(
         z-index: -2;               /* позади оверлея и контента */
         object-fit: cover;
         pointer-events: none;
-    }
+    }}
     /* Монохромный полупрозрачный слой ПЕРЕД фоновым изображением */
-    .bg-overlay {
+    .bg-overlay {{
         position: fixed;
         top: 0;
         left: 0;
@@ -40,9 +62,9 @@ st.markdown(
         background-color: rgba(17, 14, 31, 0.7);  /* монохромный (тёмно-фиолетовый) полупрозрачный фон */
         z-index: -1;               /* выше картинки, но ниже контента */
         pointer-events: none;
-    }
+    }}
     </style>
-    <img class="bg-image" src="bg.png" alt="background">
+    {bg_image_tag}
     <div class="bg-overlay"></div>
     """,
     unsafe_allow_html=True
