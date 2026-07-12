@@ -57,7 +57,7 @@ if img_src:
             pointer-events: none;
         }}
         </style>
-        <img class="bg-image" src="bg.png" alt="background">
+        <img class="bg-image" src="bgg.png" alt="background">
         <div class="bg-overlay"></div>
         """,
         unsafe_allow_html=True
