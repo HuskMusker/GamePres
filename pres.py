@@ -53,7 +53,7 @@ st.markdown(
 }
 
 .stApp {
-    background: linear-gradient(rgba(17,14,31,0.85), rgba(17,14,31,0.85)), 
+    background: linear-gradient(rgba(17,255,31,0.85), rgba(17,14,31,0.85)), 
     url('bgg.png') center/cover no-repeat fixed;
     color: var(--text-primary);
     font-family: var(--font-family);
