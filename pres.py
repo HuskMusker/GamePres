@@ -30,7 +30,7 @@ st.set_page_config(
 )
 
 # Вставка фонового изображения через base64
-base64_img = get_base64_image("bg.png")  # файл bg.png должен быть в папке с приложением
+base64_img = get_base64_image("bg1.png")  # файл bg.png должен быть в папке с приложением
 if base64_img:
         # CSS-правила: фон через body, оверлей поверх, контент сверху
     bg_style = f"""
