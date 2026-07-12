@@ -24,10 +24,10 @@ st.markdown(
         left: 0;
         width: 100%;
         height: 100%;
-        opacity: 1;          /* регулируйте видимость (0 – невидимо, 1 – полностью) */
-        z-index: -1;            /* отправляет картинку за весь контент */
-        object-fit: cover;      /* заполняет экран с сохранением пропорций */
-        pointer-events: none;   /* клики проходят сквозь картинку */
+        opacity: 0.15;
+        z-index: -1;
+        object-fit: cover;
+        pointer-events: none;
     }
     </style>
     <img class="bg-image" src="bg.png" alt="background">
