@@ -45,12 +45,14 @@ st.markdown(
         position: fixed;
         top: 0;
         left: 0;
-        width: 1920;
-        height: 1080;
+        width: 100%;
+        height: 100%;
         opacity: 1;               /* изображение полностью видимо */
         z-index: -2;               /* позади оверлея и контента */
         object-fit: cover;
         pointer-events: none;
+        transform: scale(1.2);          /* ← увеличение масштаба на 20 % */
+        transform-origin: center center; /* не обязательно, но для ясности */
     }}
     /* Монохромный полупрозрачный слой ПЕРЕД фоновым изображением */
     .bg-overlay {{
