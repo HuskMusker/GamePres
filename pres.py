@@ -73,12 +73,14 @@ st.markdown(
 }
 
 .stApp {
-    background: var(--bg-primary);
+    background: transparent !important;
     color: var(--text-primary);
     font-family: var(--font-family);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    position: relative;
+    z-index: 2; /* весь контент будет выше фоновых слоёв */
 }
 
 @keyframes fadeInUp {
