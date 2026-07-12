@@ -41,8 +41,7 @@ if base64_img:
         background-size: 120%;               /* масштаб: 100% = оригинал, >100% = зум; можно auto 120% и т.п. */
         background-position: center;
         background-repeat: no-repeat;
-        background-attachment: fixed; 
-        filter: blur(0px); 
+        background-attachment: fixed;  
         /* фиксация при скролле */
         margin: 0;
         padding: 0;
