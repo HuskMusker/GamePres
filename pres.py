@@ -4,6 +4,8 @@ import json
 import time
 import pandas as pd
 import streamlit.components.v1 as components
+import base64
+from pathlib import Path
 
 # ------------------------------
 # Настройка страницы
@@ -15,34 +17,39 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+def img_to_bytes(img_path):
+    img_bytes = Path(img_path).read_bytes()
+    encoded = base64.b64encode(img_bytes).decode()
+    return encoded
+
+# Замените старый блок с bg-image на:
+img_base64 = img_to_bytes("bg.png")
 st.markdown(
-    """
+    f"""
     <style>
-    /* Фоновое изображение */
-    .bg-image {
+    .bg-image {{
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        opacity: 1;               /* изображение полностью видимо */
-        z-index: -2;               /* позади оверлея и контента */
+        opacity: 1;
+        z-index: -2;
         object-fit: cover;
         pointer-events: none;
-    }
-    /* Монохромный полупрозрачный слой ПЕРЕД фоновым изображением */
-    .bg-overlay {
+    }}
+    .bg-overlay {{
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(17, 14, 31, 0.7);  /* монохромный (тёмно-фиолетовый) полупрозрачный фон */
-        z-index: -1;               /* выше картинки, но ниже контента */
+        background-color: rgba(17, 14, 31, 0.7);
+        z-index: -1;
         pointer-events: none;
-    }
+    }}
     </style>
-    <img class="bg-image" src="bg.png" alt="background">
+    <img class="bg-image" src="data:image/png;base64,{img_base64}" alt="background">
     <div class="bg-overlay"></div>
     """,
     unsafe_allow_html=True
