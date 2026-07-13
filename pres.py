@@ -30,10 +30,12 @@ st.set_page_config(
 )
 
 # Вставка фонового изображения через base64
-base64_img = get_base64_image("bg2.png")
+base64_img = get_base64_image("bg2.png")  # файл bg.png должен быть в папке с приложением
 if base64_img:
+    # CSS-правила: фон через body, оверлей поверх, контент сверху
     bg_style = f"""
     <style>
+    /* Убираем старый .bg-image */
     body {{
         background-image: url("data:image/png;base64,{base64_img}");
         background-size: 120%;
@@ -88,7 +90,7 @@ if (el) el.scrollIntoView({behavior: 'instant'});
 """, height=0)
 
 # ------------------------------
-# CSS (лёгкие подчёркнутые поля, улучшенная типографика + анимации)
+# CSS (лёгкие подчёркнутые поля, улучшенная типографика + анимации при наведении)
 # ------------------------------
 st.markdown(
     """
@@ -152,6 +154,7 @@ h2, h3, h4 {
     margin-bottom: 1.5em;
 }
 
+/* Обёртка для центрирования всего ряда */
 .sort-row-wrapper {
     display: flex;
     justify-content: center;
@@ -216,6 +219,7 @@ h2, h3, h4 {
     box-shadow: none;
 }
 
+/* Кнопка "Назад" в nav-container */
 .nav-container > div:first-child .stButton button {
     background: rgba(255, 255, 255, 0.15);
     border: 2px solid rgba(255, 255, 255, 0.7);
@@ -358,8 +362,9 @@ textarea, input[type="text"], input[type="password"], input[type="email"] {
     border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
     border-radius: 8px !important;
     color: #FFFFFF !important;
-    transition: all var(--transition-speed) cubic-bezier(0.2, 0.9, 0.3, 1);
+    transition: all var(--transition-speed) cubic-bezier(0.2, 0.9, 0.3, 1); /* единый transition */
 }
+/* Анимация при наведении на текстовые поля */
 textarea:hover, input[type="text"]:hover, input[type="password"]:hover, input[type="email"]:hover {
     background: rgba(21, 28, 49, 0.9) !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -371,6 +376,7 @@ textarea:focus, input:focus {
     box-shadow: 0 1px 0 0 var(--accent-cyan) !important;
 }
 
+/* Анимация при наведении на selectbox (списки) */
 .stSelectbox > div:first-child {
     transition: all var(--transition-speed) cubic-bezier(0.2, 0.9, 0.3, 1);
 }
@@ -380,6 +386,7 @@ textarea:focus, input:focus {
     transform: translateY(-2px);
 }
 
+/* Анимация для radio и checkbox – подсветка строки при наведении */
 .stRadio > div:hover, .stCheckbox > div:hover {
     background: rgba(255, 255, 255, 0.03);
     border-radius: 8px;
@@ -435,6 +442,7 @@ div[data-testid="stAlert"][data-kind="info"] {
     border-left-color: var(--accent-cyan) !important;
 }
 
+/* Блок-подсказка (bridge-block) – анимация при наведении */
 .bridge-block {
     background: rgba(64, 196, 255, 0.08);
     border-left: 4px solid var(--accent-cyan);
@@ -454,6 +462,7 @@ div[data-testid="stAlert"][data-kind="info"] {
     color: var(--accent-cyan);
 }
 
+/* Надписи (score-display, badge) – лёгкая анимация при наведении */
 .score-display {
     transition: transform var(--transition-speed);
 }
@@ -468,18 +477,10 @@ div[data-testid="stAlert"][data-kind="info"] {
     box-shadow: 0 2px 8px rgba(255, 215, 0, 0.2);
 }
 
-/* Прогресс-бар шага – закреплён сверху при прокрутке */
 .step-indicator {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background: rgba(17, 14, 31, 0.95);
-    backdrop-filter: blur(8px);
-    padding: 0.5rem 1rem;
-    margin-bottom: 1rem;
-    border-bottom: 1px solid var(--border-card);
     font-size: 0.9rem;
     color: var(--text-muted);
+    margin-bottom: 0.8rem;
 }
 .step-indicator .progress-bar-container {
     display: flex;
@@ -524,7 +525,7 @@ div[data-testid="stAlert"][data-kind="info"] {
 )
 
 # ------------------------------
-# Инициализация состояния (без изменений)
+# Инициализация состояния
 # ------------------------------
 INIT_STATE = {
     "page": "intro",
@@ -585,7 +586,7 @@ for key, value in INIT_STATE.items():
         st.session_state[key] = value
 
 # ------------------------------
-# Вспомогательные функции (без изменений)
+# Вспомогательные функции
 # ------------------------------
 def go_to_page(page):
     st.session_state.page = page
@@ -753,7 +754,7 @@ def generate_mailto_body():
     return "%0D%0A".join(lines)
 
 # ------------------------------
-# Боковая панель (без изменений)
+# Боковая панель
 # ------------------------------
 with st.sidebar:
     st.markdown('<div class="sidebar-header">⚖️ Цифровой куратор</div>', unsafe_allow_html=True)
@@ -799,7 +800,7 @@ with st.sidebar:
             go_to_page("diagnostics")
 
 # ------------------------------
-# Основной контент (без изменений)
+# Основной контент
 # ------------------------------
 if st.session_state.page == "intro":
     st.markdown('<div class="main-header">Добро пожаловать на курс «Цифровой куратор»!</div>', unsafe_allow_html=True)
