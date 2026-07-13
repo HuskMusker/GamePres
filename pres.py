@@ -222,7 +222,7 @@ h2, h3, h4 {
 /* Кнопка "Назад" в nav-container */
 .nav-container > div:first-child .stButton button {
     background: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 2px solid rgba(255, 255, 255, 0.7);
     color: #FFFFFF;
     box-shadow: none;
 }
