@@ -32,8 +32,10 @@ st.set_page_config(
 # Вставка фонового изображения через base64
 base64_img = get_base64_image("bg2.png")  # файл bg.png должен быть в папке с приложением
 if base64_img:
+    # CSS-правила: фон через body, оверлей поверх, контент сверху
     bg_style = f"""
     <style>
+    /* Убираем старый .bg-image */
     body {{
         background-image: url("data:image/png;base64,{base64_img}");
         background-size: 120%;
@@ -152,6 +154,7 @@ h2, h3, h4 {
     margin-bottom: 1.5em;
 }
 
+/* Обёртка для центрирования всего ряда */
 .sort-row-wrapper {
     display: flex;
     justify-content: center;
@@ -216,6 +219,7 @@ h2, h3, h4 {
     box-shadow: none;
 }
 
+/* Кнопка "Назад" в nav-container */
 .nav-container > div:first-child .stButton button {
     background: rgba(255, 255, 255, 0.15);
     border: 1px solid rgba(255, 255, 255, 0.5);
@@ -318,16 +322,13 @@ a:hover {
     border: 1px solid rgba(255, 215, 0, 0.15);
 }
 
-/* Увеличенный шрифт для основных вопросов (radio, checkbox, selectbox) */
-.stRadio label, .stCheckbox label, .stSelectbox label {
-    color: #FFFFFF !important;
-    font-weight: 400;
-    font-size: 1.1rem !important;  /* немного крупнее */
-}
 .stRadio > div, .stCheckbox > div {
     margin-bottom: 0.6rem;
 }
-
+.stRadio label, .stCheckbox label {
+    color: #FFFFFF !important;
+    font-weight: 400;
+}
 .stSelectbox, .stTextArea, .stSlider {
     background: var(--bg-card);
     border-radius: 12px;
@@ -354,15 +355,16 @@ textarea, input[type="text"], input[type="password"], input[type="email"] {
     max-width: 100% !important;
     width: 100% !important;
     padding: 8px 0 !important;
-    font-size: 1.05rem !important;  /* немного крупнее */
+    font-size: 0.95rem !important;
     line-height: 1.4 !important;
     background: var(--input-bg) !important;
     border: none !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
     border-radius: 8px !important;
     color: #FFFFFF !important;
-    transition: all var(--transition-speed) cubic-bezier(0.2, 0.9, 0.3, 1);
+    transition: all var(--transition-speed) cubic-bezier(0.2, 0.9, 0.3, 1); /* единый transition */
 }
+/* Анимация при наведении на текстовые поля */
 textarea:hover, input[type="text"]:hover, input[type="password"]:hover, input[type="email"]:hover {
     background: rgba(21, 28, 49, 0.9) !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -374,6 +376,7 @@ textarea:focus, input:focus {
     box-shadow: 0 1px 0 0 var(--accent-cyan) !important;
 }
 
+/* Анимация при наведении на selectbox (списки) */
 .stSelectbox > div:first-child {
     transition: all var(--transition-speed) cubic-bezier(0.2, 0.9, 0.3, 1);
 }
@@ -383,6 +386,7 @@ textarea:focus, input:focus {
     transform: translateY(-2px);
 }
 
+/* Анимация для radio и checkbox – подсветка строки при наведении */
 .stRadio > div:hover, .stCheckbox > div:hover {
     background: rgba(255, 255, 255, 0.03);
     border-radius: 8px;
@@ -438,6 +442,7 @@ div[data-testid="stAlert"][data-kind="info"] {
     border-left-color: var(--accent-cyan) !important;
 }
 
+/* Блок-подсказка (bridge-block) – анимация при наведении */
 .bridge-block {
     background: rgba(64, 196, 255, 0.08);
     border-left: 4px solid var(--accent-cyan);
@@ -457,6 +462,7 @@ div[data-testid="stAlert"][data-kind="info"] {
     color: var(--accent-cyan);
 }
 
+/* Надписи (score-display, badge) – лёгкая анимация при наведении */
 .score-display {
     transition: transform var(--transition-speed);
 }
